@@ -3,7 +3,7 @@ import Home from './pages/Home';
 import Generate from './pages/Generate';
 import Samples from './pages/Samples';
 import Community from './pages/Community';
-import Profile from './pages/Profile';
+import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import './App.css'
 
@@ -16,7 +16,7 @@ function App() {
         <Route path="/generate" element={<Generate />} />
         <Route path="/samples" element={<Samples />} />
         <Route path="/community" element={<Community />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/login" element={<Login />} />
         {/*Error Page*/}
         <Route path="*" element={<NotFound />} />
       </Routes>
