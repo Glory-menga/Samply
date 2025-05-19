@@ -1,14 +1,14 @@
 import Nav from '../components/Nav';
 
-function Home(){
+function Generate(){
     return(
         <>
             <Nav />
             <div>
-                <h1>Home</h1>
+                <h1>Generate</h1>
             </div>
         </>
     );
 }
 
-export default Home;
+export default Generate;
