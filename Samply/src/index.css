@@ -27,3 +27,10 @@ p{
   color: white;
   font-family: 'Manrope';
 }
+
+/* Space */
+.space{
+  background-color: red;
+  position: absolute;
+  height: 100vh;
+}

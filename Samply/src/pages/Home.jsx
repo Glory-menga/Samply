@@ -4,7 +4,10 @@ function Home(){
     return(
         <>
             <Nav />
-            <div>
+            <div className='space'>
+                test
+            </div>
+            <div className='container'>
                 <h1>Home</h1>
             </div>
         </>
