@@ -9,6 +9,10 @@ function Nav(){
             <ul>
                 <li><Link to="/">Home</Link></li>
                 <li><Link to="/generate">Generate</Link></li>
+                <li><Link to="/samples">Samples</Link></li>
+                <li><Link to="/community">Community</Link></li>
+                <li className='line-nav'></li>
+                <li><Link to="/profile">Profile</Link></li>
             </ul>
         </nav>
     );
