@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+@font-face {
+  font-family: 'Altone';
+  src: url(./assets/fonts/AltoneTrial-Bold.ttf);
+}
+*{
+  margin: 0;
+  padding: 0;
+  background-color: black;
+}
+h1{
+  color: white;
+  font-size: 80px;
+  font-family: 'Altone';
+}
+h2{
+  color: white;
+  font-size: 50px;
+  font-family: 'Altone';
+}
+a{
+  color: white;
+  font-family: 'Manrope';
+  text-decoration: none;
+}
+p{
+  color: white;
+  font-family: 'Manrope';
+}
