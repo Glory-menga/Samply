@@ -1,13 +1,14 @@
 import Nav from '../components/Nav';
+import Galaxy from '../components/3dObjects/Galaxy';
 
 function Home(){
     return(
         <>
             <Nav />
             <div className='space'>
-                test
+                <Galaxy/>
             </div>
-            <div className='container'>
+            <div className="container-space">
                 <h1>Home</h1>
             </div>
         </>

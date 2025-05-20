@@ -30,7 +30,20 @@ p{
 
 /* Space */
 .space{
-  background-color: red;
   position: absolute;
-  height: 100vh;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.galaxy-container {
+  width: 100%;
+  height: 100%;
+}
+.container-space {
+  color: white;
+}
+.container-space h1{
+  position: relative;
+   background-color: transparent;
 }
