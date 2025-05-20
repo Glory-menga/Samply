@@ -19,6 +19,7 @@ nav a {
   position: relative;
   display: inline-block;
   padding: 2px 0;
+  background-color: transparent;
 }
 .nav-links {
   display: flex;
@@ -30,10 +31,15 @@ nav a {
 }
 li {
   list-style: none;
+  background-color: transparent;
+}
+.logo{
+  background-color: transparent;
 }
 .logo a {
   font-size: 25px;
   font-weight: 300;
+  background-color: transparent;
 }
 .line-nav {
   border-left: 0.2px solid #fff;
