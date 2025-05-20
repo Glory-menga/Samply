@@ -5,7 +5,8 @@ function Nav() {
   const location = useLocation();
   
   return (
-    <nav>
+    <div className='nav'>
+      <nav>
       <div className='logo'>
         <Link to="/">Samply</Link>
       </div>
@@ -18,6 +19,7 @@ function Nav() {
         <li><Link to="/login" className={location.pathname === "/login" ? "active" : ""}>Login</Link></li>
       </ul>
     </nav>
+    </div>
   );
 }
 
