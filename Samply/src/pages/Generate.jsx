@@ -3,10 +3,11 @@ import Nav from '../components/Nav';
 import AnimatedBackground from '../components/Background/AnimatedBackground';
 import { ChevronRight, Headphones, HeadphoneOff, Info, CircleX, X } from 'lucide-react';
 import Metaball from '../components/3dObjects/Metaball';
+import { motion, AnimatePresence } from 'motion/react';
 
 function Generate(){
     const [prompt, setPrompt] = useState('');
-    const [showTips, setShowTips] = useState(true);
+    const [showTips, setShowTips] = useState(false);
     const [headphonesOn, headphonesOff] = useState(true);
     const [isGenerating, setIsGenerating] = useState(false);
 
@@ -31,6 +32,58 @@ function Generate(){
         }, 2000);
     };
 
+
+    const tipsAnimationVariants = {
+        hidden: { 
+            opacity: 0,
+            y: 50,
+            transition: { 
+                duration: 0.3,
+                ease: "easeInOut"
+            }
+        },
+        visible: { 
+            opacity: 1,
+            y: 0,
+            transition: { 
+                duration: 0.3,
+                ease: "easeOut",
+                when: "beforeChildren",
+                staggerChildren: 0.2 
+            }
+        },
+        exit: {
+            opacity: 0,
+            y: 50,
+            transition: { 
+                duration: 0.3,
+                ease: "easeInOut",
+                when: "afterChildren",
+                staggerChildren: 0
+            }
+        }
+    };
+    
+    const tipItemVariants = {
+        hidden: { 
+            opacity: 0,
+            y: 20,
+            transition: { duration: 0.3 }
+        },
+        visible: custom => ({ 
+            opacity: 1,
+            y: 0,
+            transition: { 
+                duration: 0.3,
+                delay: custom * 0.1
+            }
+        }),
+        exit: { 
+            opacity: 0,
+            transition: { duration: 0.3 }
+        }
+    };
+
     return(
         <>
             <Nav /> 
@@ -41,40 +94,66 @@ function Generate(){
                         <h1>Generate a Sample</h1>
                         <p>Enter a prompt describing the type of melody you want, including mood, style, and tempo (e.g., 'uplifting jazzy melody with a fast tempo').</p>
                     </div>
-                    <div className='tips-generate'>
-                        <div className='tip'>
-                            <div className='tip-number'>
-                                <p>1.</p>
-                            </div>
-                            <div className='tip-txt'>
-                                <p><b>Describe Your Sound</b> – Choose a mood, style, and tempo (e.g., "chill lofi beat with slow tempo").</p>
-                            </div>
-                        </div>
-                        <div className='tip'>
-                            <div className='tip-number'>
-                                <p>2.</p>
-                            </div>
-                            <div className='tip-txt'>
-                                <p><b> Generate the Sample</b> – Click "Generate" to create a unique AI-powered sound.</p>
-                            </div>
-                        </div>
-                        <div className='tip'>
-                            <div className='tip-number'>
-                                <p>3.</p>
-                            </div>
-                            <div className='tip-txt'>
-                                <p><b>Listen & Refine</b> – Play your sample and tweak the prompt for different results.</p>
-                            </div>
-                        </div>
-                        <div className='tip'>
-                            <div className='tip-number'>
-                                <p>4.</p>
-                            </div>
-                            <div className='tip-txt'>
-                                <p><b>Download & Use</b> – Save your sample for music production, content, or inspiration.</p>
-                            </div>
-                        </div>
-                    </div>
+                    <AnimatePresence>
+                        {showTips && (
+                            <motion.div 
+                                className='tips-generate'
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit"
+                                variants={tipsAnimationVariants}
+                            >
+                                <motion.div 
+                                    className='tip'
+                                    variants={tipItemVariants}
+                                    custom={0}
+                                >
+                                    <div className='tip-number'>
+                                        <p>1.</p>
+                                    </div>
+                                    <div className='tip-txt'>
+                                        <p><b>Describe Your Sound</b> – Choose a mood, style, and tempo (e.g., "chill lofi beat with slow tempo").</p>
+                                    </div>
+                                </motion.div>
+                                <motion.div 
+                                    className='tip'
+                                    variants={tipItemVariants}
+                                    custom={1}
+                                >
+                                    <div className='tip-number'>
+                                        <p>2.</p>
+                                    </div>
+                                    <div className='tip-txt'>
+                                        <p><b> Generate the Sample</b> – Click "Generate" to create a unique AI-powered sound.</p>
+                                    </div>
+                                </motion.div>
+                                <motion.div 
+                                    className='tip'
+                                    variants={tipItemVariants}
+                                    custom={2}
+                                >
+                                    <div className='tip-number'>
+                                        <p>3.</p>
+                                    </div>
+                                    <div className='tip-txt'>
+                                        <p><b>Listen & Refine</b> – Play your sample and tweak the prompt for different results.</p>
+                                    </div>
+                                </motion.div>
+                                <motion.div 
+                                    className='tip'
+                                    variants={tipItemVariants}
+                                    custom={3}
+                                >
+                                    <div className='tip-number'>
+                                        <p>4.</p>
+                                    </div>
+                                    <div className='tip-txt'>
+                                        <p><b>Download & Use</b> – Save your sample for music production, content, or inspiration.</p>
+                                    </div>
+                                </motion.div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                      
                     <div className='prompt'>
                         <div className='input-prompt'>
@@ -117,7 +196,7 @@ function Generate(){
                 </div>
                 <div className='help-generate'>
                     <div className='help-sphere'>
-                        <Metaball width="100%" height="100%" sphereScale={1} />
+                        <Metaball width="100%" height="100%" sphereScale={0.9} />
                     </div>
                     <div className='help-icons'>
                         <div className="tips-toggle">
