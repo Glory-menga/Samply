@@ -81,8 +81,8 @@ const Galaxy = () => {
     const animate = () => {
       requestAnimationFrame(animate);
       
-      starSystem.rotation.y += 0.0001;
-      starSystem.rotation.x += 0.00005;
+      starSystem.rotation.y += 0.0002;
+      starSystem.rotation.x += 0.00010;
       
       const positions = starGeometry.attributes.position.array;
       
