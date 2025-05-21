@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Nav from '../components/Nav';
 import AnimatedBackground from '../components/Background/AnimatedBackground';
 import { ChevronRight, Headphones, HeadphoneOff, Info, CircleX, X } from 'lucide-react';
 import Metaball from '../components/3dObjects/Metaball';
 import { motion, AnimatePresence } from 'motion/react';
+import generateVoice from '../assets/audio/Generate_Voice.mp3';
 
 function Generate(){
     const [prompt, setPrompt] = useState('');
     const [showTips, setShowTips] = useState(false);
-    const [headphonesOn, headphonesOff] = useState(true);
-    const [isGenerating, setIsGenerating] = useState(false);
+    const [headphonesOn, setHeadphonesOn] = useState(true);
+    const [analyser, setAnalyser] = useState(null);
+    const audioRef = useRef(null);
+    const audioContextRef = useRef(null);
 
     const inspirationPrompts = [
         "dreamy piano melody with a slow tempo",
@@ -20,18 +23,79 @@ function Generate(){
         "acoustic folk progression with warm tones"
     ];
 
+    useEffect(() => {
+        const setupAudio = async () => {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                audioContextRef.current = audioContext;
+                
+                const audio = new Audio(generateVoice);
+                audio.loop = false; 
+                audio.volume = 0.6;
+                audioRef.current = audio;
+                
+                const analyserNode = audioContext.createAnalyser();
+                analyserNode.fftSize = 256;
+                
+                const source = audioContext.createMediaElementSource(audio);
+                source.connect(analyserNode);
+                analyserNode.connect(audioContext.destination);
+                
+                setAnalyser(analyserNode);
+                
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        if (error.name !== 'AbortError') {
+                            console.error("Audio playback failed:", error);
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error("Audio setup failed:", err);
+            }
+        };
+        
+        setupAudio();
+        
+        return () => {
+            if (audioRef.current) {
+                const audio = audioRef.current;
+                
+                if (!audio.paused) {
+                    audio.pause();
+                }
+                
+                audio.currentTime = 0;
+                audioRef.current = null;
+            }
+            
+            if (audioContextRef.current) {
+                if (audioContextRef.current.state !== 'closed') {
+                    audioContextRef.current.close().catch(err => 
+                        console.error("Error closing audio context:", err)
+                    );
+                }
+            }
+            
+            setAnalyser(null);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (audioRef.current) {
+            audioRef.current.muted = !headphonesOn;
+        }
+    }, [headphonesOn]);
+
     const handleGetInspiration = () => {
         const randomPrompt = inspirationPrompts[Math.floor(Math.random() * inspirationPrompts.length)];
         setPrompt(randomPrompt);
     };
 
-    const handleGenerateSample = () => {
-        setIsGenerating(true);
-        setTimeout(() => {
-            setIsGenerating(false);
-        }, 2000);
+    const toggleHeadphones = () => {
+        setHeadphonesOn(!headphonesOn);
     };
-
 
     const tipsAnimationVariants = {
         hidden: { 
@@ -162,41 +226,27 @@ function Generate(){
                                 value={prompt}
                                 onChange={(e) => setPrompt(e.target.value)}
                                 placeholder="Type something like 'dreamy piano melody with a slow tempo' or 'funky guitar riff with high energy'..."
-                                disabled={isGenerating}
                             />
                         </div>
                         <div className='buttons-prompt'>
                             <button
                                 className="btn-inspiration"
                                 onClick={handleGetInspiration}
-                                disabled={isGenerating}
                             >
                                 <span>Need inspiration?</span>
                             </button>
                             
-                            <button
-                                className={`btn-generate ${isGenerating ? 'generating' : ''}`}
-                                onClick={handleGenerateSample}
-                                disabled={!prompt || isGenerating}
-                            >
-                                {isGenerating ? (
-                                <>
-                                    <span className="loading-spinner"></span>
-                                    <span>Generating...</span>
-                                </>
-                                ) : (
-                                <>
-                                    <span>Generate</span>
-                                    <ChevronRight size={32} strokeWidth={1} />
-                                </>
-                                )}
+                            <button className="btn-generate">
+                                    <p>Generate</p>
+                                    <ChevronRight size={28} strokeWidth={1} />
+
                             </button>
                         </div>
                     </div>
                 </div>
                 <div className='help-generate'>
                     <div className='help-sphere'>
-                        <Metaball width="100%" height="100%" sphereScale={0.9} />
+                        <Metaball width="100%" height="100%" sphereScale={0.9} analyser={analyser} />
                     </div>
                     <div className='help-icons'>
                         <div className="tips-toggle">
@@ -212,11 +262,12 @@ function Generate(){
                             )}
                             </button>
                         </div>
-                        <div className="tips-toggle">
-                            <button onClick={() => headphonesOff(!headphonesOn)}>
+                        <div className="sound-toggle">
+                            <button onClick={toggleHeadphones}>
                             {headphonesOn ? (
                                 <>
-                                <Headphones size={40} strokeWidth={1} color='#fff' />                                </>
+                                <Headphones size={40} strokeWidth={1} color='#fff' />
+                                </>
                             ) : (
                                 <>
                                 <HeadphoneOff size={40} strokeWidth={1} color='#fff' />

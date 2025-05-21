@@ -175,9 +175,11 @@ nav ul li a.active:after {
 .btn-generate{
   display: flex;
   flex-direction: row;
-  justify-content: center;
   align-items: flex-end;
+}
+.btn-generate p{
   font-size: 25px;
+  font-weight: 300;
 }
 .buttons-prompt{
   display: flex;
@@ -234,7 +236,11 @@ nav ul li a.active:after {
   border: none;
   cursor: pointer;
 }
-
+.sound-toggle button{
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
 /* Not Found */
 .not-found{
   position: absolute;
