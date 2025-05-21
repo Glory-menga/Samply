@@ -5,7 +5,7 @@ import { SimplexNoise } from 'three-stdlib';
 
 const simplex = new SimplexNoise();
 
-const Sphere = ({ analyser = null }) => {
+const Sphere = ({ analyser = null, scale = 1 }) => {
   const meshRef = useRef(null);
   const basePositions = useRef(null);
   const time = useRef(0);
@@ -61,7 +61,7 @@ const Sphere = ({ analyser = null }) => {
   });
 
   return (
-    <mesh ref={meshRef}>
+    <mesh ref={meshRef} scale={scale}>
       <sphereGeometry args={[1, 128, 128]} />
       <meshPhysicalMaterial
         color="#36454F"
