@@ -27,6 +27,12 @@ h3{
   font-family: 'Manrope';
   font-size: 60px;
 }
+h4{
+  color: white;
+  font-weight: 400;
+  font-family: 'Manrope';
+  font-size: 35px;
+}
 a{
   color: white;
   font-family: 'Manrope';
