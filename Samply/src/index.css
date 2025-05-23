@@ -21,6 +21,12 @@ h2{
   font-size: 50px;
   font-family: 'Altone';
 }
+h3{
+  color: white;
+  font-weight: 200;
+  font-family: 'Manrope';
+  font-size: 60px;
+}
 a{
   color: white;
   font-family: 'Manrope';

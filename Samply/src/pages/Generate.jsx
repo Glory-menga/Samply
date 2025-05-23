@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Nav from '../components/Nav';
-import AnimatedBackground from '../components/Background/AnimatedBackground';
+import AnimatedBackground from '../components/background/AnimatedBackground';
 import { ChevronRight, Headphones, HeadphoneOff, Info, CircleX, X } from 'lucide-react';
 import Metaball from '../components/3dObjects/Metaball';
 import { motion, AnimatePresence } from 'motion/react';
