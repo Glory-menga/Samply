@@ -119,8 +119,8 @@ p{
 
 .gradient-bg {
   width: 100%;
-  height: 100vh;
-  position: absolute;
+  height: 100%;
+  position: fixed;
   top: 0;
   overflow: hidden;
   background: linear-gradient(40deg, var(--color-bg1), var(--color-bg2));
@@ -212,4 +212,48 @@ p{
   animation: moveInCircle 20s ease infinite;
   opacity: 1;
   will-change: transform;
+}
+
+/*Tabs*/
+.saved-samples {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  position: fixed;
+  top: 120px;
+  right: 0;
+  width: 50px;
+  height: 40px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.saved-samples:hover {
+  gap: 12px;
+  width: 160px;
+  transform: scale(1.05);
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.saved-samples-text {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000;
+  opacity: 0;
+  white-space: nowrap;
+  transition: opacity 0.3s ease-in-out 0.1s;
+  width: 0;
+  overflow: hidden;
+}
+
+.saved-samples:hover .saved-samples-text {
+  opacity: 1;
+  width: auto;
 }

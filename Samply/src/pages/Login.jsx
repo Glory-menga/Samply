@@ -1,14 +1,14 @@
 import Nav from '../components/Nav';
 
-function Profile(){
+function Login(){
     return(
         <>
             <Nav />
             <div>
-                <h1>Profile</h1>
+                <h1>Login</h1>
             </div>
         </>
     );
 }
 
-export default Profile;
+export default Login;
