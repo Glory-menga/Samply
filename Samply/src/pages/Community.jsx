@@ -1,5 +1,6 @@
 import AnimatedBackground from '../components/background/AnimatedBackground';
 import Nav from '../components/Nav';
+import { Link } from 'react-router';
 import { Heart, ArrowDownToLine, Play, Share2, CircleUser, MessageSquare    } from 'lucide-react';
 import LikedSamplesTab from '../components/tabs/LikedSamplesTab';
 
@@ -79,14 +80,14 @@ function Community(){
                                         </div>
                                     </div>
                                     <div className='wave-icons'>
-                                        <div className='wave-icon'>
+                                        <Link to='#' className='wave-icon'>
                                             <Heart size={28} strokeWidth={1} color='#fff'/>
                                             <p>206</p>
-                                        </div>
-                                        <div className='wave-icon'>
+                                        </Link>
+                                        <Link to='/comment-sample' className='wave-icon'>
                                             <MessageSquare size={28} strokeWidth={1} color='#fff'/>
                                             <p>206</p>
-                                        </div>
+                                        </Link>
                                     </div>
                                 </div>
                             </div>

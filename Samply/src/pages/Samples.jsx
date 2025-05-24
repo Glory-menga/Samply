@@ -350,6 +350,7 @@ function Samples(){
                         </div>
                     </div>
                     
+                    
                 </div>
                 
                 {/* Audio element for Peaks.js */}
