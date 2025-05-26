@@ -1,0 +1,26 @@
+.loading-page-container{
+    position: absolute;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.loading-page-container p{
+    margin-top: 40px;
+    font-size: 22px
+}
+.metaballs-loading{
+    display: flex;
+    flex-direction: row;
+    gap: 60px;
+}
+.metaball-loading{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 250px;
+    width: 250px;
+}

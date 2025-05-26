@@ -11,6 +11,7 @@ import LikedSamples from './pages/LikedSamples';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Profile from './pages/Profile';
+import LoadingPage from './components/LoadingPage';
 import NotFound from './pages/NotFound';
 import './App.css'
 
@@ -31,6 +32,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/loading-page" element={<LoadingPage />} />
         {/*Error Page*/}
         <Route path="*" element={<NotFound />} />
       </Routes>

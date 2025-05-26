@@ -5,14 +5,14 @@ import { SimplexNoise } from 'three-stdlib';
 
 const simplex = new SimplexNoise();
 
-const Sphere = ({ analyser = null, scale = 1 }) => {
+const Sphere = ({ analyser = null, scale = 1, animationSpeed = 1 }) => {
   const meshRef = useRef(null);
   const basePositions = useRef(null);
   const time = useRef(0);
   const dataArray = useRef(null);
 
   useFrame((_, delta) => {
-    time.current += delta;
+    time.current += delta * animationSpeed; // Apply animation speed multiplier
     const mesh = meshRef.current;
     const geometry = mesh.geometry;
     const position = geometry.attributes.position;
@@ -50,7 +50,7 @@ const Sphere = ({ analyser = null, scale = 1 }) => {
         x * 1.5,
         y * 1.5,
         z * 1.5,
-        time.current * 0.5
+        time.current * 0.5 
       );
       const scale = 1 + noise * boost;
       position.setXYZ(i, x * scale, y * scale, z * scale);

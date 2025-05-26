@@ -3,7 +3,13 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment } from '@react-three/drei';
 import Sphere from './Sphere';
 
-const Metaball = ({ analyser, width = '100%', height = '100%', sphereScale = 1 }) => {
+const Metaball = ({ 
+  analyser, 
+  width = '100%', 
+  height = '100%', 
+  sphereScale = 1, 
+  animationSpeed = 1 
+}) => {
   return (
     <div style={{ width, height, background: 'transparent' }}>
       <Canvas 
@@ -15,7 +21,11 @@ const Metaball = ({ analyser, width = '100%', height = '100%', sphereScale = 1 }
         <directionalLight position={[-5, 5, 5]} intensity={1.5} color="#ffffff"/>
         <directionalLight position={[0, -5, -5]} intensity={1} />
         <Environment preset="studio" />
-        <Sphere analyser={analyser} scale={sphereScale} />
+        <Sphere 
+          analyser={analyser} 
+          scale={sphereScale} 
+          animationSpeed={animationSpeed} 
+        />
         <OrbitControls enableZoom={false} enablePan={false} />
       </Canvas>
     </div>
