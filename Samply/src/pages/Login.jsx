@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import { useNavigate } from "react-router";
 import AnimatedBackground from "../components/background/AnimatedBackground";
 import { Link } from "react-router";
-import { Mail } from 'lucide-react';
+import { Mail, Eye, EyeOff } from 'lucide-react';
 import  '../css/Login.css';
 
 function Login(){
     const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false);
 
     return(
         <>
@@ -16,7 +18,7 @@ function Login(){
                 </div>
                 <div className="login-form">
                     <div className="go-home">
-                        <button onClick={() => navigate(-1)}><p>Home</p></button>
+                        <button><Link to="/"><p>Home</p></Link></button>
                     </div>
                     <div className="form-txt">
                         <h2>Log in</h2>
@@ -26,11 +28,19 @@ function Login(){
                                 id="email" 
                                 placeholder="Email adress"
                             />
-                            <input
-                                type="password" 
-                                id="password" 
-                                placeholder="Password"
-                            />
+                            <div className="password-wrapper">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    id="password"
+                                    placeholder="Password"
+                                />
+                                <span
+                                    className="eye-icon"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <EyeOff size={30} strokeWidth={1} /> : <Eye size={30} strokeWidth={1}/>}
+                                </span>
+                            </div>
                         </div>
                         <div className="signup-suggestion">
                             <p>Don't have an <Link to="/signup" className="go-signup">account</Link> yet?</p>

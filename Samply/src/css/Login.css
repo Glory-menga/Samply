@@ -62,8 +62,22 @@
   background-color: transparent;
   font-family: 'manrope';
   font-size: 16px;
-  padding: 12px 250px 12px 10px;
+  padding: 12px 0px 12px 10px;
   font-weight: 200;
+}
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.password-wrapper input {
+    width: 100%;
+}
+.eye-icon {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: #888;
 }
 .signup-suggestion{
   display: flex;
@@ -119,10 +133,6 @@
   flex-direction: column;
   justify-content: center;
 }
-.side-connections p{
-  font-weight: 400;
-  color: #fff;
-}
 .side-connections button{
   display: flex;
   flex-direction: row;
@@ -134,4 +144,8 @@
   padding: 12px 0px;
   width: 100%;
   gap: 10px;
+}
+.side-connections button p{
+  font-weight: 400;
+  color: #fff;
 }

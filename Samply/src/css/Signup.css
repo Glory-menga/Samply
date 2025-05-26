@@ -1,1 +1,91 @@
 /*Signup*/
+.sign-container{
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100vh;
+}
+.signup-form-wrapper{
+  background-color: white;
+  width: 50%;
+  height: 100%;
+}
+.signup-background{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  height: 100%;
+}
+.txt-signup-background{
+  width: 70%;
+}
+.signup-background  h2{
+  display: flex;
+  font-size: 90px;
+}
+.signup-background p{
+  font-size: 28px;
+}
+.signup-form-txt{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0 auto;
+  width: 80%;
+  height: 92%;
+}
+.signup-form-txt h2{
+  display: flex;
+  justify-content: center;
+  color: #000;
+}
+.signup-form-txt p{
+  color: #000;
+}
+.signup-form{
+  display: flex;
+  flex-direction: column;
+  margin-top: 70px;
+  gap: 16px;
+}
+.signup-form input{
+  outline: none;
+  border: 1px solid #000;
+  background-color: transparent;
+  font-family: 'manrope';
+  font-size: 16px;
+  padding: 12px 0px 12px 10px;
+  font-weight: 200;
+}
+.signup-password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.signup-password-wrapper input {
+    width: 100%;
+}
+.signup-eye-icon {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: #888;
+}
+.signup-get-started{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-top: 50px;
+}
+.signup-get-started button{
+  border: none;
+  background: none;
+}
+.signup-get-started p{
+  cursor: pointer;
+  font-size: 25px;
+  font-weight: 400;
+}
