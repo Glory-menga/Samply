@@ -4,6 +4,7 @@ import Nav from '../components/Nav';
 import Galaxy from '../components/3dObjects/Galaxy';
 import Metaball from '../components/3dObjects/Metaball';
 import bgMusic from '../assets/audio/Space_Background_Music.mp3';
+import '../css/Home.css';
 
 function Home() {
   const [analyser, setAnalyser] = useState(null);

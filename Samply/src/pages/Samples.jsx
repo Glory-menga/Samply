@@ -5,6 +5,7 @@ import SavedSamplesTab from '../components/tabs/SavedSamplesTab';
 import AnimatedBackground from '../components/background/AnimatedBackground';
 import { Save, ArrowDownToLine, Play, Pause, Share2} from 'lucide-react';
 import audioFile from '../assets/audio/Generate_Voice.mp3'; 
+import '../css/Samples.css';
 
 function Samples(){
     const audioRef = useRef(null);

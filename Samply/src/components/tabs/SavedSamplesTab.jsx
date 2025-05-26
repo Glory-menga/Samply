@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { Save } from "lucide-react";
+import '../../css/Tabs.css';
 
 function SavedSamplesTab() {
  return (

@@ -3,7 +3,7 @@ import Nav from '../components/Nav';
 import { Link } from 'react-router';
 import { Heart, ArrowDownToLine, Play, Share2, CircleUser, MessageSquare    } from 'lucide-react';
 import LikedSamplesTab from '../components/tabs/LikedSamplesTab';
-
+import '../css/Community.css';
 function Community(){
     return(
         <>

@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Generate from './pages/Generate';
 import SampleGenerated from './pages/SampleGenerated';
+import EditSample from './pages/EditSample';
 import Samples from './pages/Samples';
 import Community from './pages/Community';
 import CommentSample from './pages/CommentSample';
@@ -20,6 +21,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/generate" element={<Generate />} />
         <Route path="/sample-generated" element={<SampleGenerated />} />
+        <Route path="/edit-sample" element={<EditSample />} />
         <Route path="/samples" element={<Samples />} />
         <Route path="/community" element={<Community />} />
         <Route path="/comment-sample" element={<CommentSample />} />

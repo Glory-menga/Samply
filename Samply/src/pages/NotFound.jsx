@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import AnimatedBackground from '../components/background/AnimatedBackground';
+import '../css/NotFound.css';
+
 function NotFound(){
     return(
         <>

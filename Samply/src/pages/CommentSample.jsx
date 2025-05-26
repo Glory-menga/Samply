@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import AnimatedBackground from '../components/background/AnimatedBackground';
 import { CircleUser, ArrowDownToLine, Share2, Heart, Play, Send  } from 'lucide-react';
-
+import '../css/CommentSample.css';
 function CommentSample(){
     const navigate = useNavigate();
 

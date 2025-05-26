@@ -1,0 +1,93 @@
+/*TABS*/
+/*Saved Samples*/
+.saved-samples {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255);
+  position: fixed;
+  top: 120px;
+  right: 0;
+  width: 50px;
+  height: 40px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+  text-decoration: none;
+}
+.saved-samples:hover {
+  gap: 12px;
+  width: 160px;
+  transform: scale(1.05);
+  background-color: rgba(255, 255, 255);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.saved-samples-text {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000;
+  opacity: 0;
+  white-space: nowrap;
+  transition: opacity 0.3s ease-in-out 0.1s;
+  width: 0;
+  overflow: hidden;
+}
+.saved-samples:hover .saved-samples-text {
+  opacity: 1;
+  width: auto;
+}
+
+/*LikedSamples*/
+.liked-samples {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255);
+  position: fixed;
+  top: 120px;
+  right: 0;
+  width: 50px;
+  height: 40px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.liked-samples:hover {
+  gap: 12px;
+  width: 160px;
+  transform: scale(1.05);
+  background-color: rgba(255, 255, 255);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.liked-samples-text {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000;
+  opacity: 0;
+  white-space: nowrap;
+  transition: opacity 0.3s ease-in-out 0.1s;
+  width: 0;
+  overflow: hidden;
+}
+.liked-samples:hover .liked-samples-text {
+  opacity: 1;
+  width: auto;
+}
+.white-line{
+  border-top: 1px solid #fff;
+  margin: 80px -20px 40px -20px;
+  opacity: 0.1;
+}
+.white-line2{
+  border-top: 1px solid #fff;
+  margin: 20px -20px 60px -20px;
+  opacity: 0.1;
+}

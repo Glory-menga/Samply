@@ -1,0 +1,122 @@
+/* SampleGenerated */
+.sample-generated-container{
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  width: 100%;
+  height: 100vh;
+}
+.sample-generated-wrapper{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.intro-sample-generated{
+  margin-top: 15px;
+  margin-left: 18px;
+}
+.intro-sample-generated h1{
+  font-size: 58px;
+}
+.generated-samples{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0px 0px 20px;
+  height: 100%;
+}
+.generated-sample{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 60px;
+  height: 100%;
+  width: 56%;
+}
+.sample-gen{
+  display: flex;
+  flex-direction: column;
+}
+.audio-generated-sample{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 10px;
+  height: 150px;
+  background: rgba(252, 252, 252, 0.4);
+  backdrop-filter: blur(10px);
+  padding: 15px;
+}
+.name-generated-sample{
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 18px;
+}
+.generated-sample-icons{
+  display: flex;
+  gap: 8px;
+}
+.post-gen-sample{
+  margin-top: 20px;
+}
+.intro-audio-gen{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.wave-generated-sample{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.waveform-gen{
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
+  gap: 15px;
+}
+.wave-gen{
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+}
+.timestamps-generated-sample{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+.edit-generated-sample{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: flex-end;
+  width: 15%;
+  gap: 8px;
+}
+.generated-prompt{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-left: 1px solid #fff;
+  width: 38%;
+  height: 70%;
+}
+.gen-prompt{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  text-align: center;
+}
+.gen-prompt p{
+  width: 70%;
+}
+.gen-metaball{
+    height: 50px;
+    width: 50px;
+}
+

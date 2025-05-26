@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { Heart } from "lucide-react";
+import '../../css/Tabs.css';
 
 function LikedSamplesTab() {
  return (

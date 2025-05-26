@@ -1,0 +1,146 @@
+/* EditSample */
+.edit-sample-container{
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  width: 100%;
+  height: 100vh;
+  z-index: 3;
+}
+.edit-sample-wrapper{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 0px 20px;
+  height: 100%;
+}
+.edit-metaball{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+}
+.placement-metaball{
+  height: 460px;
+  width: 460px;
+}
+.timestamps-edit-sample{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding-bottom: 10px;
+}
+.time-sample{
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  font-size: 18px;
+}
+.edit-pitch-semitones{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+  height: 400px;
+  width: 400px;
+}
+.edit-tempo{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  width: 400px;
+}
+.reverse-toggle{
+  display: flex;
+  flex-direction: row;
+  align-items: center ;
+  gap: 25px;
+}
+.reverse-toggle p{
+  font-size: 20px;
+}
+.checkbox-custom {
+  all: unset;
+  width: 25px;
+  height: 25px;
+  background-color: transparent;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.checkbox-custom[data-state='checked'] {
+  background-color: white;
+  border-color: white;
+}
+.checkbox-indicator svg {
+  color: black;
+  width: 25px;
+  height: 25px;
+}
+.tempo-slider-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.tempo-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 200px;               
+  height: 2px;
+  background: white;
+  border: none;
+  transform: rotate(-90deg);  
+  cursor: pointer;
+  position: relative;
+  display: block;
+}
+.tempo-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 4px;
+  height: 26px;
+  background: white;
+  border-radius: 1px;
+  border: none;
+  cursor: grab;
+  box-shadow: 0 0 0 1px white;
+  transition: 0.2s ease;
+}
+.tempo-slider::-webkit-slider-thumb:active {
+  cursor: grabbing;
+}
+.tempo-slider::-moz-range-thumb {
+  width: 24px;
+  height: 6px;
+  background: white;
+  border-radius: 1px;
+  border: none;
+  cursor: grab;
+  box-shadow: 0 0 0 1px white;
+}
+.tempo-slider::-moz-range-thumb:active {
+  cursor: grabbing;
+}
+.tempo-label{
+  font-size: 20px;
+}
+.edit-sample-icons{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  position: absolute;
+  width: 80px;
+  z-index: 5;
+  top: 10px;
+  right: 5px;
+  gap: 10px;
+}
+

@@ -5,7 +5,7 @@ import { ChevronRight, Headphones, HeadphoneOff, Info, CircleX, X } from 'lucide
 import Metaball from '../components/3dObjects/Metaball';
 import { motion, AnimatePresence } from 'motion/react';
 import generateVoice from '../assets/audio/Generate_Voice.mp3';
-
+import '../css/Generate.css';
 function Generate(){
     const [prompt, setPrompt] = useState('');
     const [showTips, setShowTips] = useState(false);

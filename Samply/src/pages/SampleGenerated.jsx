@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import AnimatedBackground from "../components/background/AnimatedBackground";
 import { ArrowDownToLine, Save, Play  } from 'lucide-react';
 import Metaball from '../components/3dObjects/Metaball';
+import '../css/SampleGenerated.css';
 
 function SampleGenerated(){
     const navigate = useNavigate();
