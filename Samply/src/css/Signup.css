@@ -81,8 +81,13 @@
   margin-top: 50px;
 }
 .signup-get-started button{
+  cursor: pointer;
   border: none;
   background: none;
+  transition: 0.3s;
+}
+.signup-get-started button:hover{
+  scale: 1.2;
 }
 .signup-get-started p{
   cursor: pointer;

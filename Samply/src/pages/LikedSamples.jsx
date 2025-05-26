@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import AnimatedBackground from "../components/background/AnimatedBackground";
 import { CircleUser, Heart, ArrowDownToLine, Play  } from 'lucide-react';
-
+import '../css/SavedSamples.css'
 function LikedSamples() {
     const navigate = useNavigate();
 
@@ -29,7 +29,9 @@ function LikedSamples() {
                                         </div>
                                     </div>
                                     <div className='wave-saved-sample'>
-                                        <Play size={40} strokeWidth={1} color='#fff' fill='#fff'/>
+                                        <button>
+                                            <Play size={40} strokeWidth={1} color='#fff' fill='#fff'/>
+                                        </button>
                                         <div className='wave-sample'>
                                             <div className='waveform-saved-sample'>
                                                 wave
@@ -43,7 +45,9 @@ function LikedSamples() {
                                 </div>
                                 <div className='prompt-saved-sample'>
                                     <div className='like-icon'>
-                                        <Heart  size={32} strokeWidth={1} color='#fff'/>
+                                        <div className='heart-icon'>
+                                            <Heart  size={32} strokeWidth={1} color='#fff'/>
+                                        </div>
                                     </div>
                                     <p>Craft a smooth jazz melody with a walking bassline, mellow piano chords, and a soulful saxophone lead. Add soft brush drums and a touch of vibraphone for a cozy, late-night lounge vibe.</p>
                                 </div>

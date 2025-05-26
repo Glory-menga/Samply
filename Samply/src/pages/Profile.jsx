@@ -91,7 +91,7 @@ function Profile() {
                         </div>
                         <div className='change-password-button'>
                             <button onClick={handleChangePasswordClick}>
-                                <p>Change Password</p>
+                               <p>{showChangePassword ? 'Close' : 'Change Password'}</p>
                             </button>
                         </div>
                         
@@ -178,7 +178,9 @@ function Profile() {
                                 </button>
                             </div>
                             <div className='white-divider'></div>
-                            <button><p>Save</p></button>
+                            <div className='save-button'>
+                                <button><p>Save</p></button>
+                            </div>
                         </div>
                     </div>
                 </div>

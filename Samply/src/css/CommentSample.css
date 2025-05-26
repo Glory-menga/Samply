@@ -5,6 +5,27 @@
   flex-direction: column;
   width: 100%;
 }
+.back button{
+  position: relative;
+  cursor: pointer;
+  color: #fff;
+  overflow: hidden;
+}
+.back button::after{
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background-color: #fff;
+  opacity: 0.5;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+.back button:hover::after{
+  width: 100%;
+  left: 0;
+}
 .intro-comment-sample{
   display: flex;
   flex-direction: column;
@@ -52,6 +73,31 @@
   flex-direction: row;
   align-items: center;
   gap: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.info-post-icon:hover{
+ scale: 1.2;
+}
+.info-post-icon p{
+  position: relative;
+  cursor: pointer;
+  color: #fff;
+  overflow: hidden;
+}
+.info-post-icon p::after{
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 0.5px;
+  background-color: #fff;
+  transition: width 0.3s ease, left 0.3s ease;  
+}
+.info-post-icon p:hover::after{
+  width: 100%;
+  left: 0;
 }
 .audio-post-comment{
   display: flex;
@@ -65,6 +111,11 @@
   align-items: flex-start;
   width: 100%;
   gap: 20px;
+}
+.wave-post-comment button{
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 .waveform-post-comment{
   width: 80%;
@@ -80,6 +131,31 @@
   flex-direction: row;
   align-items: center;
   gap: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.like-post-comment:hover{
+ scale: 1.2;
+}
+.like-post-comment p{
+  position: relative;
+  cursor: pointer;
+  color: #fff;
+  overflow: hidden;
+}
+.like-post-comment p::after{
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background-color: #fff;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+.like-post-comment p:hover::after{
+  width: 100%;
+  left: 0;
 }
 .prompt-post-comment{
   display: flex;
@@ -126,6 +202,11 @@
   flex-direction: row;
   align-items: center;
   gap: 15px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.post-comment:hover{
+  scale: 1.2;
 }
 .comments{
   display: flex;
@@ -151,6 +232,14 @@
   flex-direction: row;
   align-items: center;
   gap: 10px;
+}
+.comment-icon button{
+  border: none;
+  background: none;
+  transition: 0.3s;
+}
+.comment-icon button:hover{
+  scale: 1.2;
 }
 .profile-comment{
   display: flex;

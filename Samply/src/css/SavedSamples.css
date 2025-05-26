@@ -10,9 +10,27 @@
   margin: 20px;
 }
 .back button{
+  position: relative;
   cursor: pointer;
   background: none;
   border: none;
+  color: #fff;
+  overflow: hidden;
+}
+.back button::after{
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background-color: #fff;
+  opacity: 0.5;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+.back button:hover::after{
+  width: 100%;
+  left: 0;
 }
 .back button p{
   font-size: 18px;
@@ -63,12 +81,21 @@
 .saved-sample-icons{
   display: flex;
   gap: 8px;
+  transition: 0.3s;
+}
+.saved-sample-icons:hover{
+  scale: 1.2;
 }
 .wave-saved-sample{
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   gap: 20px;
+}
+.wave-saved-sample button{
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 .wave-sample{
   display: flex;
@@ -97,4 +124,10 @@
   justify-content: flex-end;
   height: 26%;
   width: 100%;
+}
+.heart-icon{
+  transition: 0.3s;
+}
+.heart-icon:hover{
+  scale: 1.2;
 }

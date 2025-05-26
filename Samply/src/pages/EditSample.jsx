@@ -34,7 +34,6 @@ function EditSample(){
                                 id="reverse"
                                 onCheckedChange={(checked) => {
                                 console.log("Reverse is", checked ? "ON" : "OFF");
-                                // You can update state here if needed
                                 }}
                             >
                                 <Checkbox.Indicator className="checkbox-indicator">
@@ -63,7 +62,9 @@ function EditSample(){
                         </div>
                     </div>
                     <div className='timestamps-edit-sample'>
-                        <Play size={32} strokeWidth={1} color='#fff' fill='#fff'/>
+                        <button>
+                            <Play size={32} strokeWidth={1} color='#fff' fill='#fff'/>
+                        </button>
                         <div className='time-sample'>
                             <p>00:00</p>
                             <p>/</p>
@@ -73,8 +74,12 @@ function EditSample(){
                 </div>
             </div>
             <div className='edit-sample-icons'>
-                <Save size={32} strokeWidth={1} color='#fff'/>
-                <ArrowDownToLine size={32} strokeWidth={1} color='#fff'/>
+                <button>
+                    <Save size={32} strokeWidth={1} color='#fff'/>
+                </button>
+                <button>
+                    <ArrowDownToLine size={32} strokeWidth={1} color='#fff'/>
+                </button>
             </div>
         </>
     );

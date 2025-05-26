@@ -53,15 +53,37 @@
   height: 150px;
 }
 .btn-inspiration{
-    font-size: 16px;
-    text-decoration: underline;
-    text-decoration-thickness: 0.5px;
-    text-underline-offset: 5.5px;
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  font-size: 16px;
+  overflow: hidden;
+}
+.btn-inspiration::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  bottom: 2px;
+  height: 1px;
+  background-color: #fff;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+.btn-inspiration:hover::after {
+  width: 100%;
+  left: 0;
 }
 .btn-generate{
   display: flex;
   flex-direction: row;
   align-items: flex-end;
+  transition: 0.3s;
+}
+.btn-generate:hover{
+  scale: 1.2;
 }
 .btn-generate p{
   font-size: 25px;
@@ -120,10 +142,17 @@
   background-color: transparent;
   border: none;
   cursor: pointer;
+  transition: 0.3s;
+}
+.tips-toggle button:hover{
+  scale: 1.2;
 }
 .sound-toggle button{
   background-color: transparent;
   border: none;
   cursor: pointer;
+  transition: 0.3s;
 }
-
+.sound-toggle button:hover{
+  scale: 1.2;
+}

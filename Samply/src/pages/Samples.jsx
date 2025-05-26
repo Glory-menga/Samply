@@ -292,8 +292,12 @@ function Samples(){
                                     <p>Jazzy sample type beat</p>
                                 </div>
                                 <div className='sample-icons'>
-                                    <Save size={32} strokeWidth={1} color='#fff'/>
-                                    <ArrowDownToLine size={32} strokeWidth={1} color='#fff'/>
+                                    <button>
+                                        <Save size={32} strokeWidth={1} color='#fff'/>
+                                    </button>
+                                    <button>
+                                        <ArrowDownToLine size={32} strokeWidth={1} color='#fff'/>
+                                    </button>
                                 </div>
                             </div>
                             <div className='audio-wave'>

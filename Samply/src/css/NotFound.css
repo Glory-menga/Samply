@@ -15,17 +15,23 @@
   margin-top: 10px;
 }
 .not-found a{
+  position: relative;
+  color: #fff;
+  overflow: hidden;
   margin-left: 2px;
   margin-top: 10px;
-  text-decoration: underline;
-  text-decoration-thickness: 0.2px;
-  text-underline-offset: 3px;
-  transition: 0.3s;
 }
-.not-found a:hover{
-  font-size: 20px;
-  text-decoration: underline;
-  text-decoration-thickness: 0.2px;
-  text-underline-offset: 3px;
-  transition: 0.3s;
+.not-found a::after{
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background-color: #fff;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+.not-found a:hover::after{
+  width: 100%;
+  left: 0;
 }

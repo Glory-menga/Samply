@@ -66,10 +66,27 @@
     height: 100%;
 }
 .change-password-button button{
+    position: relative;
     border: none;
     background: none;
+    color: #fff;
+    overflow: hidden;
     font-size: 18px;
     cursor: pointer;
+}
+.change-password-button button::after{
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 0.5px;
+  background-color: #fff;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+.change-password-button button:hover::after{
+  width: 100%;
+  left: 0;
 }
 .old-password, .new-password, .password-confirm{
     display: flex;
@@ -86,6 +103,9 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+}
+.password-change span{
+    cursor: pointer;
 }
 .password-change input{
     font-family: 'Manrope';
@@ -118,10 +138,27 @@
     width: 280px;
 }
 .upload-pic button{
+    position: relative;
     cursor: pointer;
     border: none;
     background: none;
+    color: #fff;
+    overflow: hidden;
     font-size: 18px;
+}
+.upload-pic button::after{
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 1px;
+    background-color: #fff;
+    transition: width 0.3s ease, left 0.3s ease;
+}
+.upload-pic button:hover::after{
+    width: 100%;
+    left: 0;
 }
 .disconnect-save{
     display: flex;
@@ -129,6 +166,7 @@
     justify-content: flex-end;
     align-items: center;
     gap: 20px;
+    margin: 0px 15px 15px 0px;
 }
 .disconnect-save button{
     display: flex;
@@ -140,10 +178,54 @@
     font-size: 35px;
     gap: 10px;
 }
+.disconnect button{
+    position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    overflow: hidden;
+}
+.disconnect button::after{
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 1px;
+    background-color: #CF0000;
+    transition: width 0.3s ease, left 0.3s ease;
+}
+.disconnect button:hover::after{
+    width: 100%;
+    left: 0;
+}
 .disconnect button p{
     color: #CF0000;
 }
 .white-divider{
     height: 30px;
     border-left: 1px solid #fff;
+}
+.save-button{
+    position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    overflow: hidden;
+}
+.save-button::after{
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 1px;
+    background-color: #fff;
+    transition: width 0.3s ease, left 0.3s ease;
+}
+.save-button:hover::after{
+    width: 100%;
+    left: 0; 
 }

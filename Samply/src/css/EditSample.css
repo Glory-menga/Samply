@@ -33,6 +33,11 @@
   gap: 20px;
   padding-bottom: 10px;
 }
+.timestamps-edit-sample button{
+  cursor: pointer;
+  border: none;
+  background: none;
+}
 .time-sample{
   display: flex;
   flex-direction: row;
@@ -143,4 +148,11 @@
   right: 5px;
   gap: 10px;
 }
-
+.edit-sample-icons button{
+  border: none;
+  background: none;
+  transition: 0.3s;
+}
+.edit-sample-icons button:hover{
+  scale: 1.2;
+}

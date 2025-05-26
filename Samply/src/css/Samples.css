@@ -55,6 +55,15 @@
   flex-direction: row;
   gap: 10px;
 }
+.sample-icons button{
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: 0.3s;
+}
+.sample-icons button:hover{
+  scale: 1.2;
+}
 .audio-wave{
   display: flex;
   flex-direction: row;
@@ -106,7 +115,31 @@
   align-items: center;
   gap: 10px;
   cursor: pointer;
+  transition: 0.3s;
+}
+.share button:hover{
+  scale: 1.1;
 }
 .share p{
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fff;
   font-size: 18px;
+  overflow: hidden;
+}
+.share p::after{
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background-color: #fff;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+.share p:hover::after{
+  width: 100%;
+  left: 0;
 }

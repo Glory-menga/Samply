@@ -27,8 +27,26 @@
   padding: 15px;
 }
 .go-home button{
+  cursor: pointer;
+  position: relative;
   background: none;
   border: none;
+  color: #fff;
+  overflow: hidden;
+}
+.go-home button::after{
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background-color: grey;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+.go-home button:hover::after{
+  width: 100%;
+  left: 0;
 }
 .go-home p{
   font-size: 20px;
@@ -86,10 +104,23 @@
   margin-top: 6px;
 }
 .go-signup{
+  position: relative;
+  overflow: hidden;
   color: grey;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
+}
+.go-signup::after{
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background-color: grey;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+.go-signup:hover::after{
+  width: 100%;
+  left: 0;
 }
 .get-started{
   display: flex;
@@ -98,8 +129,13 @@
   margin-top: 50px;
 }
 .get-started button{
+  cursor: pointer;
   border: none;
   background: none;
+  transition: 0.3s;
+}
+.get-started button:hover{
+  scale: 1.2;
 }
 .get-started p{
   cursor: pointer;
@@ -144,6 +180,11 @@
   padding: 12px 0px;
   width: 100%;
   gap: 10px;
+  transition: 0.3s;
+}
+.side-connections button:hover{
+  padding: 18px 0px;
+  background-color: #383838;
 }
 .side-connections button p{
   font-weight: 400;

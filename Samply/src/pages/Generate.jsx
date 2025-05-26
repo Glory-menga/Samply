@@ -234,7 +234,7 @@ function Generate(){
                                 className="btn-inspiration"
                                 onClick={handleGetInspiration}
                             >
-                                <span>Need inspiration?</span>
+                                <p>Need inspiration?</p>
                             </button>
                             
                             <button className="btn-generate">

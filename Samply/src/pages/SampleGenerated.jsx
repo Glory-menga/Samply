@@ -28,13 +28,19 @@ function SampleGenerated(){
                                             <p> Jazzy melody with a slow tempo</p>
                                         </div>
                                         <div className='generated-sample-icons'>
-                                            <ArrowDownToLine size={28} strokeWidth={1} color='#fff'/>
-                                            <Save size={28} strokeWidth={1} color='#fff'/>
+                                            <button>
+                                                <ArrowDownToLine size={28} strokeWidth={1} color='#fff'/>
+                                            </button>
+                                            <button>
+                                                <Save size={28} strokeWidth={1} color='#fff'/>
+                                            </button>
                                         </div>
                                     </div>
                                     <div className='wave-generated-sample'>
                                         <div className='waveform-gen'>
-                                            <Play size={40} strokeWidth={1} color='#fff' fill='#fff'/>
+                                            <button>
+                                                <Play size={40} strokeWidth={1} color='#fff' fill='#fff'/>
+                                            </button>
                                             <div className='wave-gen'>
                                                 <p>Wave</p>
                                                 <div className='timestamps-generated-sample'>
@@ -63,13 +69,19 @@ function SampleGenerated(){
                                             <p> Jazzy melody with a slow tempo</p>
                                         </div>
                                         <div className='generated-sample-icons'>
-                                            <ArrowDownToLine size={28} strokeWidth={1} color='#fff'/>
-                                            <Save size={28} strokeWidth={1} color='#fff'/>
+                                            <button>
+                                                <ArrowDownToLine size={28} strokeWidth={1} color='#fff'/>
+                                            </button>
+                                            <button>
+                                                <Save size={28} strokeWidth={1} color='#fff'/>
+                                            </button>
                                         </div>
                                     </div>
                                     <div className='wave-generated-sample'>
                                         <div className='waveform-gen'>
-                                            <Play size={40} strokeWidth={1} color='#fff' fill='#fff'/>
+                                            <button>
+                                                <Play size={40} strokeWidth={1} color='#fff' fill='#fff'/>
+                                            </button>
                                             <div className='wave-gen'>
                                                 <p>Wave</p>
                                                 <div className='timestamps-generated-sample'>

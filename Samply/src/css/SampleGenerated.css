@@ -58,8 +58,37 @@
   display: flex;
   gap: 8px;
 }
+.generated-sample-icons button{
+  border: none;
+  background: none;
+  transition: 0.3s;
+}
+.generated-sample-icons button:hover{
+  scale: 1.2;
+}
 .post-gen-sample{
   margin-top: 20px;
+}
+.post-gen-sample p{
+  position: relative;
+  cursor: pointer;
+  color: #fff;
+  overflow: hidden;
+  width: 88px;
+}
+.post-gen-sample p::after{
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background-color: #fff;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+.post-gen-sample p:hover::after{
+  width: 100%;
+  left: 0;
 }
 .intro-audio-gen{
   display: flex;
@@ -77,6 +106,11 @@
   align-items: flex-start;
   width: 100%;
   gap: 15px;
+}
+.waveform-gen button{
+  cursor: pointer;
+  background: none;
+  border: none;
 }
 .wave-gen{
   display: flex;
@@ -96,6 +130,11 @@
   align-items: flex-end;
   width: 15%;
   gap: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.edit-generated-sample:hover{
+  scale: 1.1;
 }
 .generated-prompt{
   display: flex;

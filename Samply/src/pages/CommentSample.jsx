@@ -34,7 +34,9 @@ function CommentSample(){
                             </div>
                             <div className='audio-post-comment'>
                                 <div className='wave-post-comment'>
-                                    <Play size={42} strokeWidth={1} color='#fff' fill='#fff'/>
+                                    <button>
+                                        <Play size={42} strokeWidth={1} color='#fff' fill='#fff'/>
+                                    </button>
                                     <div className='waveform-post-comment'>
                                         <div className='waveform-audio'>
                                             <p>Wave</p>
@@ -77,7 +79,9 @@ function CommentSample(){
                                     <p>Glory - 5h Ago</p>
                                 </div>
                                 <div className='comment-icon'>
-                                    <Heart size={30} strokeWidth={1} color='#fff'/>
+                                    <button>
+                                        <Heart size={30} strokeWidth={1} color='#fff'/>
+                                    </button>
                                     <p>351</p>
                                 </div>
                             </div>  
@@ -92,7 +96,9 @@ function CommentSample(){
                                     <p>Glory - 5h Ago</p>
                                 </div>
                                 <div className='comment-icon'>
-                                    <Heart size={30} strokeWidth={1} color='#fff'/>
+                                    <button>
+                                        <Heart size={30} strokeWidth={1} color='#fff'/>
+                                    </button>
                                     <p>351</p>
                                 </div>
                             </div>  
@@ -107,7 +113,9 @@ function CommentSample(){
                                     <p>Glory - 5h Ago</p>
                                 </div>
                                 <div className='comment-icon'>
-                                    <Heart size={30} strokeWidth={1} color='#fff'/>
+                                    <button>
+                                        <Heart size={30} strokeWidth={1} color='#fff'/>
+                                    </button>
                                     <p>351</p>
                                 </div>
                             </div>  
@@ -122,7 +130,9 @@ function CommentSample(){
                                     <p>Glory - 5h Ago</p>
                                 </div>
                                 <div className='comment-icon'>
-                                    <Heart size={30} strokeWidth={1} color='#fff'/>
+                                    <button>
+                                        <Heart size={30} strokeWidth={1} color='#fff'/>
+                                    </button>
                                     <p>351</p>
                                 </div>
                             </div>  

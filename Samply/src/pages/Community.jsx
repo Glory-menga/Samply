@@ -19,8 +19,12 @@ function Community(){
                             <div className='profile-popular-post'>
                                 <p>Glory</p>
                                 <div className='popular-post-icons'>
-                                    <Heart size={24} strokeWidth={1} color='#fff'/>
-                                    <ArrowDownToLine size={24} strokeWidth={1} color='#fff'/>
+                                    <button>
+                                        <Heart size={24} strokeWidth={1} color='#fff'/>
+                                    </button>
+                                    <button>
+                                        <ArrowDownToLine size={24} strokeWidth={1} color='#fff'/>
+                                    </button>
                                 </div>
                             </div>
                             <div className='title-popular-post'>
@@ -28,7 +32,9 @@ function Community(){
                             </div>
                         </div>
                         <div className='audio-popular-post'>
-                            <Play size={34} strokeWidth={1} color='#fff' fill='#fff'/>
+                            <button>
+                                <Play size={34} strokeWidth={1} color='#fff' fill='#fff'/>
+                            </button>
                             <div className='wave-popular-post'>
                                 <div className='waveform'>
                                     <p>wave</p>
@@ -69,8 +75,9 @@ function Community(){
                                 </div>
                                 <div className='wave-audio-post'>
                                     <div className='waveform-post'>
-                                        <Play size={38} strokeWidth={1} color='#fff' fill='#fff'/>
-
+                                        <button>
+                                            <Play size={38} strokeWidth={1} color='#fff' fill='#fff'/>
+                                        </button>
                                         <div className='waveform-details'>
                                             <p>wave</p>
                                             <div className='timestamps-wave-post'>
