@@ -48,7 +48,7 @@ function Signup() {
                     toast.error(error.message);
                 }
             } else {
-                toast.success("Account created! Now log in.");
+                toast.success("Account created! Now you are logged in.");
                 navigate("/login");
             }
         } catch (err) {

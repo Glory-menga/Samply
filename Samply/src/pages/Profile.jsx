@@ -1,4 +1,8 @@
 import { useState } from 'react';
+import { supabase } from '../supabaseClient';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { useUser } from '../context/UserContext';
 import '../css/Profile.css';
 import AnimatedBackground from "../components/background/AnimatedBackground";
 import Nav from '../components/Nav';
@@ -6,6 +10,8 @@ import { Eye, EyeOff, Pen, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 function Profile() {
+    const navigate = useNavigate();
+    const { user } = useUser(); 
     const [showOldPassword, setShowOldPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -64,6 +70,16 @@ function Profile() {
 
     const handleChangePasswordClick = () => {
         setShowChangePassword(!showChangePassword);
+    };
+
+    const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+        toast.error("Failed to disconnect.");
+    } else {
+        toast.success("See you next time!");
+        navigate("/login");
+    }
     };
 
     return (
@@ -172,10 +188,10 @@ function Profile() {
                         </div>
                         <div className='disconnect-save'>
                             <div className='disconnect'>
-                                <button>
-                                    <X size={40} strokeWidth={1} color='#CF0000' />
-                                    <p>Disconnect</p>
-                                </button>
+                            <button onClick={handleLogout}>
+                                <X size={40} strokeWidth={1} color='#CF0000' />
+                                <p>Disconnect</p>
+                            </button>
                             </div>
                             <div className='white-divider'></div>
                             <div className='save-button'>
