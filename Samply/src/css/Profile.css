@@ -59,6 +59,19 @@
     font-weight: 200;
     font-size: 20px;
 }
+.edit-name-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.edit-name-input input {
+    background: transparent;
+    border: 1px solid #fff;
+    color: #fff;
+    padding: 5px;
+    border-radius: 4px;
+}
 .change-password{
     display: flex;
     flex-direction: column;
@@ -135,8 +148,13 @@
 .profile-pic{
     background-color: grey;
     border-radius: 50%;
+    overflow: hidden;
     height: 280px;
     width: 280px;
+}
+.upload-pic button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 .upload-pic button{
     position: relative;
@@ -215,6 +233,14 @@
     cursor: pointer;
     color: #fff;
     overflow: hidden;
+}
+.save-button button.active {
+    cursor: pointer;
+}
+
+.save-button button.inactive {
+    opacity: 0.3;
+    cursor: not-allowed;
 }
 .save-button::after{
     content: '';
