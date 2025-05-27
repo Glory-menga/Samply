@@ -22,7 +22,13 @@ function Login(){
                     </div>
                     <div className="form-txt">
                         <h2>Log in</h2>
-                        <div className="form">
+                        <form
+                            className="signup-form"
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleSignup();     
+                            }}
+                        >
                             <input
                                 type="email" 
                                 id="email" 
@@ -41,13 +47,13 @@ function Login(){
                                     {showPassword ? <EyeOff size={30} strokeWidth={1} /> : <Eye size={30} strokeWidth={1}/>}
                                 </span>
                             </div>
-                        </div>
-                        <div className="signup-suggestion">
-                            <p>Don't have an <Link to="/signup" className="go-signup">account</Link> yet?</p>
-                        </div>
-                        <div className="get-started">
-                            <button><p>Get Started</p></button>
-                        </div>
+                            <div className="signup-suggestion">
+                                <p>Don't have an <Link to="/signup" className="go-signup">account</Link> yet?</p>
+                            </div>
+                            <div className="get-started">
+                                <button><p>Get Started</p></button>
+                            </div>
+                        </form>
                         <div className="divider">
                             <p>or</p>
                         </div>
