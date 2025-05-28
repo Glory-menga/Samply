@@ -39,11 +39,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  top: 60%;
+  top: -3%;
   transform: translateY(-40%);
-  transition: transform 0.3s ease;
-}
-
-.metaball:hover {
-  transform: translateY(-40%) scale(1.1);
 }

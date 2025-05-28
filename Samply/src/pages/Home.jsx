@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'motion/react';
 import Nav from '../components/Nav';
 import Galaxy from '../components/3dObjects/Galaxy';
 import Metaball from '../components/3dObjects/Metaball';
@@ -80,6 +81,34 @@ function Home() {
     setIsHovering(hovering);
   };
 
+  // Animation variants for metaball
+  const metaballVariants = {
+    hidden: {
+      opacity: 0,
+      y: 50,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.8,
+        ease: "easeOut",
+        delay: 0.3
+      }
+    }
+  };
+
+  // Animation variants for hover effect
+  const metaballHoverVariants = {
+    hover: {
+      scale: 1.1,
+      transition: {
+        duration: 0.3,
+        ease: "easeOut"
+      }
+    }
+  };
+
   return (
     <>
       <Nav />
@@ -90,20 +119,24 @@ function Home() {
         <div className='cta'>
           <div className="heading-container">
             <h1>Generate. Create. Inspire.</h1>
-            <div 
+            <motion.div 
               className='metaball'
               onMouseEnter={() => handleMetaballHover(true)}
               onMouseLeave={() => handleMetaballHover(false)}
               onClick={handleMetaballClick}
               style={{ cursor: 'pointer' }}
+              initial="hidden"
+              animate="visible"
+              whileHover="hover"
+              variants={{ ...metaballVariants, ...metaballHoverVariants }}
             >
               <Metaball 
                 analyser={analyser} 
                 isHovering={isHovering}
-                sphereScale={isHovering ? 1.1 : 1}
+                sphereScale={isHovering ? 1.15 : 1.1}
                 animationSpeed={isHovering ? 1.8 : 1}
               />
-            </div>
+            </motion.div>
           </div>
         </div>
         <p>Tap the ball to generate your sample!</p>

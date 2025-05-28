@@ -193,6 +193,22 @@ function Generate(){
         }
     };
 
+    const helpSphereVariants = {
+        hidden: {
+            opacity: 0,
+            y: 50,
+        },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: 0.8,
+                ease: "easeOut",
+                delay: 0.3
+            }
+        }
+    };
+
     if (loading) {
         return (
             <>
@@ -234,9 +250,14 @@ function Generate(){
                         </div>
                     </div>
                     <div className='help-generate'>
-                        <div className='help-sphere'>
+                        <motion.div 
+                            className='help-sphere'
+                            initial="hidden"
+                            animate="visible"
+                            variants={helpSphereVariants}
+                        >
                             <Metaball width="100%" height="100%" sphereScale={0.9} analyser={null} />
-                        </div>
+                        </motion.div>
                         <div className='help-icons'>
                             <div className="tips-toggle">
                                 <button disabled>
@@ -351,9 +372,14 @@ function Generate(){
                     </div>
                 </div>
                 <div className='help-generate'>
-                    <div className='help-sphere'>
+                    <motion.div 
+                        className='help-sphere'
+                        initial="hidden"
+                        animate="visible"
+                        variants={helpSphereVariants}
+                    >
                         <Metaball width="100%" height="100%" sphereScale={0.9} analyser={analyser} />
-                    </div>
+                    </motion.div>
                     <div className='help-icons'>
                         <div className="tips-toggle">
                             <button onClick={() => setShowTips(!showTips)}>
