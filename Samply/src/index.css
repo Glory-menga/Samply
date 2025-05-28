@@ -249,3 +249,91 @@ p{
   bottom: 0;
   backdrop-filter: blur(2px);
 }
+
+/* Authentication Required Overlay Styles */
+.auth-required-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.auth-required-content {
+  text-align: center;
+  color: white;
+  max-width: 500px;
+  padding: 40px;
+  background: rgba(63, 63, 63, 0.6);
+  backdrop-filter: blur(15px);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.auth-required-content h1 {
+  margin: 20px 0 15px 0;
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.auth-required-content p {
+  margin-bottom: 30px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-login, .btn-signup {
+  font-family: 'manrope', sans-serif;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 400;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.btn-login::after, .btn-signup::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  bottom: 2px;
+  height: 0.5px;
+  background-color: #fff;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+
+.btn-login:hover::after, .btn-signup:hover::after {
+  width: 100%;
+  left: 0;
+}
+
+.help-icons button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.help-icons button:disabled:hover {
+  scale: 1;
+}
