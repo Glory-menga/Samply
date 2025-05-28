@@ -16,7 +16,6 @@ function Profile() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [showChangePassword, setShowChangePassword] = useState(false);
     
-    // User data states
     const [userName, setUserName] = useState('');
     const [userEmail, setUserEmail] = useState('');
     const [isEditingName, setIsEditingName] = useState(false);
@@ -24,18 +23,15 @@ function Profile() {
     const [profilePicture, setProfilePicture] = useState('');
     const [isUploadingImage, setIsUploadingImage] = useState(false);
     
-    // Password form states
     const [passwordForm, setPasswordForm] = useState({
         newPassword: '',
         confirmPassword: ''
     });
     
-    // Change tracking
     const [hasNameChanged, setHasNameChanged] = useState(false);
     const [hasPasswordChanged, setHasPasswordChanged] = useState(false);
     const [hasImageChanged, setHasImageChanged] = useState(false);
 
-    // Load user data on component mount
     useEffect(() => {
         if (user) {
             setUserName(user.user_metadata?.username || user.email?.split('@')[0] || 'User');
@@ -120,14 +116,12 @@ function Profile() {
         const file = event.target.files[0];
         if (!file) return;
 
-        // Validate file type
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
         if (!allowedTypes.includes(file.type)) {
             toast.error('Please upload a valid image file (JPEG, PNG, or WebP)');
             return;
         }
 
-        // Validate file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
             toast.error('File size must be less than 5MB');
             return;
@@ -136,20 +130,43 @@ function Profile() {
         setIsUploadingImage(true);
 
         try {
+            const blackAndWhiteFile = await convertToBlackAndWhite(file);
+
+            if (profilePicture) {
+                try {
+                    const url = new URL(profilePicture);
+                    const pathParts = url.pathname.split('/');
+                    const bucketIndex = pathParts.findIndex(part => part === 'user-profiles');
+                    if (bucketIndex !== -1 && bucketIndex + 1 < pathParts.length) {
+                        const oldFilePath = pathParts.slice(bucketIndex + 1).join('/');
+                        
+                        const { error: deleteError } = await supabase.storage
+                            .from('user-profiles')
+                            .remove([oldFilePath]);
+                        
+                        if (deleteError) {
+                            console.warn('Could not delete old profile picture:', deleteError);
+                        }
+                    }
+                } catch (deleteError) {
+                    console.warn('Error parsing old profile picture URL:', deleteError);
+                }
+            }
+
             const fileExt = file.name.split('.').pop();
             const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-            const filePath = `pics/${fileName}`; 
+            const filePath = `pics/${fileName}`;
 
             const { error: uploadError } = await supabase.storage
-                .from('user-profiles') 
-                .upload(filePath, file);
+                .from('user-profiles')
+                .upload(filePath, blackAndWhiteFile);
 
             if (uploadError) {
                 throw uploadError;
             }
 
             const { data: { publicUrl } } = supabase.storage
-                .from('user-profiles') 
+                .from('user-profiles')
                 .getPublicUrl(filePath);
 
             const { error: updateError } = await supabase.auth.updateUser({
@@ -170,6 +187,56 @@ function Profile() {
         } finally {
             setIsUploadingImage(false);
         }
+    };
+
+    const convertToBlackAndWhite = (file) => {
+        return new Promise((resolve, reject) => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+
+                ctx.drawImage(img, 0, 0);
+
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+
+                for (let i = 0; i < data.length; i += 4) {
+                    const grayscale = Math.round(
+                        0.299 * data[i] +     
+                        0.587 * data[i + 1] +
+                        0.114 * data[i + 2]  
+                    );
+                    
+                    data[i] = grayscale;     
+                    data[i + 1] = grayscale; 
+                    data[i + 2] = grayscale; 
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        const blackAndWhiteFile = new File([blob], file.name, {
+                            type: file.type,
+                            lastModified: Date.now()
+                        });
+                        resolve(blackAndWhiteFile);
+                    } else {
+                        reject(new Error('Failed to convert image to black and white'));
+                    }
+                }, file.type, 0.9); 
+            };
+
+            img.onerror = () => {
+                reject(new Error('Failed to load image'));
+            };
+
+            img.src = URL.createObjectURL(file);
+        });
     };
 
     const handleUploadClick = () => {

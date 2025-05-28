@@ -66,11 +66,15 @@
 }
 
 .edit-name-input input {
-    background: transparent;
-    border: 1px solid #fff;
+    background: grey;
+    padding: 8px;
+    border: none;
+    font-family: 'manrope';
+    font-size: 16px;
+    font-weight: 200;
     color: #fff;
-    padding: 5px;
     border-radius: 4px;
+    outline: none;
 }
 .change-password{
     display: flex;
