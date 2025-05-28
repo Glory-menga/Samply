@@ -7,6 +7,9 @@
   background-color: transparent;
   width: 100%;
 }
+.container-space{
+  overflow: hidden;
+}
 .heading-container {
   position: relative;
   display: flex;
@@ -30,7 +33,6 @@
 .metaball{
   position: absolute;
   background-color: transparent;
-  overflow: hidden;
   width: 700px;
   height: 700px;
   z-index: 2;
@@ -39,4 +41,9 @@
   align-items: center;
   top: 60%;
   transform: translateY(-40%);
+  transition: transform 0.3s ease;
+}
+
+.metaball:hover {
+  transform: translateY(-40%) scale(1.1);
 }

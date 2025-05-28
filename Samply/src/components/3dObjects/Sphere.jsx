@@ -5,14 +5,15 @@ import { SimplexNoise } from 'three-stdlib';
 
 const simplex = new SimplexNoise();
 
-const Sphere = ({ analyser = null, scale = 1, animationSpeed = 1 }) => {
+const Sphere = ({ analyser = null, scale = 1, animationSpeed = 1, isHovering = false }) => {
   const meshRef = useRef(null);
   const basePositions = useRef(null);
   const time = useRef(0);
   const dataArray = useRef(null);
+  const materialRef = useRef(null);
 
   useFrame((_, delta) => {
-    time.current += delta * animationSpeed; // Apply animation speed multiplier
+    time.current += delta * animationSpeed; 
     const mesh = meshRef.current;
     const geometry = mesh.geometry;
     const position = geometry.attributes.position;
@@ -58,12 +59,21 @@ const Sphere = ({ analyser = null, scale = 1, animationSpeed = 1 }) => {
     
     position.needsUpdate = true;
     geometry.computeVertexNormals();
+
+    if (materialRef.current) {
+      const targetColor = isHovering ? '#9cb2c6' : '#36454F'; 
+      const currentColor = materialRef.current.color;
+      const targetColorObj = new THREE.Color(targetColor);
+      
+      currentColor.lerp(targetColorObj, delta * 10); 
+    }
   });
 
   return (
     <mesh ref={meshRef} scale={scale}>
       <sphereGeometry args={[1, 128, 128]} />
       <meshPhysicalMaterial
+        ref={materialRef}
         color="#36454F"
         roughness={0}
         metalness={1}

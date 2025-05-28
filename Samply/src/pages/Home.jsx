@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Nav from '../components/Nav';
 import Galaxy from '../components/3dObjects/Galaxy';
 import Metaball from '../components/3dObjects/Metaball';
@@ -8,8 +8,10 @@ import '../css/Home.css';
 
 function Home() {
   const [analyser, setAnalyser] = useState(null);
+  const [isHovering, setIsHovering] = useState(false);
   const audioRef = useRef(null);
   const audioContextRef = useRef(null);
+  const navigate = useNavigate();
   
   useEffect(() => {
     const setupAudio = async () => {
@@ -70,6 +72,14 @@ function Home() {
     };
   }, []);
 
+  const handleMetaballClick = () => {
+    navigate('/generate');
+  };
+
+  const handleMetaballHover = (hovering) => {
+    setIsHovering(hovering);
+  };
+
   return (
     <>
       <Nav />
@@ -80,8 +90,19 @@ function Home() {
         <div className='cta'>
           <div className="heading-container">
             <h1>Generate. Create. Inspire.</h1>
-            <div className='metaball'>
-              <Metaball analyser={analyser} />
+            <div 
+              className='metaball'
+              onMouseEnter={() => handleMetaballHover(true)}
+              onMouseLeave={() => handleMetaballHover(false)}
+              onClick={handleMetaballClick}
+              style={{ cursor: 'pointer' }}
+            >
+              <Metaball 
+                analyser={analyser} 
+                isHovering={isHovering}
+                sphereScale={isHovering ? 1.1 : 1}
+                animationSpeed={isHovering ? 1.8 : 1}
+              />
             </div>
           </div>
         </div>

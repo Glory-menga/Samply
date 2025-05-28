@@ -8,10 +8,18 @@ const Metaball = ({
   width = '100%', 
   height = '100%', 
   sphereScale = 1, 
-  animationSpeed = 1 
+  animationSpeed = 1,
+  isHovering = false
 }) => {
   return (
-    <div style={{ width, height, background: 'transparent' }}>
+    <div 
+      style={{ 
+        width, 
+        height, 
+        background: 'transparent',
+        transition: 'all 0.3s ease'
+      }}
+    >
       <Canvas 
         camera={{ position: [0, 0, 3], fov: 60 }} 
         gl={{ alpha: true, antialias: true }}
@@ -24,7 +32,8 @@ const Metaball = ({
         <Sphere 
           analyser={analyser} 
           scale={sphereScale} 
-          animationSpeed={animationSpeed} 
+          animationSpeed={animationSpeed}
+          isHovering={isHovering}
         />
         <OrbitControls enableZoom={false} enablePan={false} />
       </Canvas>
