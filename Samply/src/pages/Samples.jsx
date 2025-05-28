@@ -1,13 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Peaks from 'peaks.js';
 import Nav from '../components/Nav';
 import SavedSamplesTab from '../components/tabs/SavedSamplesTab';
 import AnimatedBackground from '../components/background/AnimatedBackground';
-import { Save, ArrowDownToLine, Play, Pause, Share2} from 'lucide-react';
+import { Save, ArrowDownToLine, Play, Pause, Share2, Lock, LogIn } from 'lucide-react';
+import { supabase } from '../supabaseClient';
 import audioFile from '../assets/audio/Generate_Voice.mp3'; 
 import '../css/Samples.css';
 
 function Samples(){
+    const navigate = useNavigate();
     const audioRef = useRef(null);
     const waveformRef = useRef(null);
     const peaksInstance = useRef(null);
@@ -16,8 +19,34 @@ function Samples(){
     const [duration, setDuration] = useState('00:00');
     const [currentTime, setCurrentTime] = useState('00:00');
     const [isLoaded, setIsLoaded] = useState(false);
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                setUser(session?.user || null);
+            } catch (error) {
+                console.error('Error checking auth:', error);
+                setUser(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        checkAuth();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            setUser(session?.user || null);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
+
+    useEffect(() => {
+        if (!user) return;
+
         const audio = audioRef.current;
         
         if (!audio || !waveformRef.current) return;
@@ -149,7 +178,7 @@ function Samples(){
                 peaksInstance.current = null;
             }
         };
-    }, []);
+    }, [user]);
 
     const formatTime = (seconds) => {
         if (isNaN(seconds)) return '00:00';
@@ -159,7 +188,7 @@ function Samples(){
     };
 
     const togglePlayPause = () => {
-        if (!peaksInstance.current || !isLoaded) return;
+        if (!user || !peaksInstance.current || !isLoaded) return;
         
         const player = peaksInstance.current.player;
         const audioElement = audioRef.current;
@@ -180,7 +209,7 @@ function Samples(){
     };
 
     const handleWaveformClick = (event) => {
-        if (!peaksInstance.current || !isLoaded) return;
+        if (!user || !peaksInstance.current || !isLoaded) return;
         
         const waveformContainer = waveformRef.current;
         const rect = waveformContainer.getBoundingClientRect();
@@ -208,7 +237,7 @@ function Samples(){
     };
 
     const handleTimestampClick = () => {
-        if (!peaksInstance.current || !isLoaded) return;
+        if (!user || !peaksInstance.current || !isLoaded) return;
         
         const timeInput = prompt("Enter time to seek to (format: mm:ss or seconds):");
         if (!timeInput) return;
@@ -248,7 +277,7 @@ function Samples(){
     };
 
     const pauseAudio = () => {
-        if (!peaksInstance.current || !isLoaded) return;
+        if (!user || !peaksInstance.current || !isLoaded) return;
         
         const player = peaksInstance.current.player;
         const audioElement = audioRef.current;
@@ -263,7 +292,7 @@ function Samples(){
     };
 
     const playAudio = () => {
-        if (!peaksInstance.current || !isLoaded) return;
+        if (!user || !peaksInstance.current || !isLoaded) return;
         
         const player = peaksInstance.current.player;
         const audioElement = audioRef.current;
@@ -276,6 +305,128 @@ function Samples(){
             }
         }
     };
+
+    const handleLogin = () => {
+        navigate('/login');
+    };
+
+    const handleSignup = () => {
+        navigate('/signup');
+    };
+
+    if (loading) {
+        return (
+            <>
+                <Nav />
+                <AnimatedBackground/>
+                <div className='sample-container'>
+                    <SavedSamplesTab/>
+                    <h1>Loading...</h1>
+                </div>
+            </>
+        );
+    }
+
+    if (!user) {
+        return (
+            <>
+                <Nav />
+                <AnimatedBackground/>
+                <div className='sample-container'>
+                    <div className='auth-required-overlay'>
+                        <div className='auth-required-content'>
+                            <Lock size={80} strokeWidth={1} color='#fff' />
+                            <h1>Log in to view your posted samples.</h1>
+                            <p>You need to be logged in to access your posted samples.</p>
+                            <div className='auth-buttons'>
+                                <button className='btn-login' onClick={handleLogin}>
+                                    <LogIn size={20} strokeWidth={1} />
+                                    <span>Log In</span>
+                                </button>
+                                <button className='btn-signup' onClick={handleSignup}>
+                                    <span>Sign Up</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <SavedSamplesTab/>
+                    <h1>Posted Samples</h1>
+                    <div className='samples'>
+                        <div className='sample'>
+                            <div className='sample-audio'>
+                                <div className='sample-intro'>
+                                    <div className='sample-txt'>
+                                        <p>Jazzy sample type beat</p>
+                                    </div>
+                                    <div className='sample-icons'>
+                                        <button disabled>
+                                            <Save size={32} strokeWidth={1} color='#666'/>
+                                        </button>
+                                        <button disabled>
+                                            <ArrowDownToLine size={32} strokeWidth={1} color='#666'/>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className='audio-wave'>
+                                    <div className='audio'>  
+                                        <button 
+                                            disabled
+                                            style={{ 
+                                                background: 'none', 
+                                                border: 'none', 
+                                                cursor: 'not-allowed',
+                                                padding: 0,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                opacity: 0.5
+                                            }}
+                                            className='play-pause'
+                                        >
+                                            <Play size={40} strokeWidth={1} color='#666' fill='#666'/>
+                                        </button>
+                                        <div className='wave-time'>
+                                            <div 
+                                                className='wave' 
+                                                ref={waveformRef}
+                                                style={{ opacity: 0.5, cursor: 'not-allowed' }}
+                                            ></div>
+                                            <div 
+                                                style={{ 
+                                                    cursor: 'not-allowed',
+                                                    userSelect: 'none',
+                                                    opacity: 0.5
+                                                }}
+                                                className='time'
+                                            >
+                                                <p>00:00</p>
+                                                <p> 00:00</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className='share'>
+                                        <button disabled>
+                                            <Share2 size={30} strokeWidth={1} color='#666'/>
+                                            <p>Share</p>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className='sample-date'>
+                                <p>6:50 PM - 05th january 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {/* Audio element for Peaks.js */}
+                <audio 
+                    ref={audioRef} 
+                    src={audioFile} 
+                    preload="metadata"
+                    style={{ display: 'none' }}
+                />
+            </>
+        );
+    }
 
     return(
         <>
