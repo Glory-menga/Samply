@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Nav from '../components/Nav';
 import AnimatedBackground from '../components/background/AnimatedBackground';
-import { ChevronRight, Headphones, HeadphoneOff, Info, CircleX, X, Lock, LogIn } from 'lucide-react';
+import { ChevronRight, Headphones, Info, CircleX, X, Lock, LogIn } from 'lucide-react';
 import Metaball from '../components/3dObjects/Metaball';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '../supabaseClient';
@@ -17,6 +17,8 @@ function Generate(){
     const [analyser, setAnalyser] = useState(null);
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [audioPlayed, setAudioPlayed] = useState(false); 
+    const [isGenerating, setIsGenerating] = useState(false);
     const audioRef = useRef(null);
     const audioContextRef = useRef(null);
 
@@ -52,7 +54,23 @@ function Generate(){
     }, []);
 
     useEffect(() => {
-        if (!user) return;
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                if (audioRef.current && !audioRef.current.paused) {
+                    audioRef.current.pause();
+                }
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!user || audioPlayed) return; 
 
         const setupAudio = async () => {
             try {
@@ -73,9 +91,15 @@ function Generate(){
                 
                 setAnalyser(analyserNode);
                 
+                audio.addEventListener('ended', () => {
+                    setAudioPlayed(true);
+                });
+                
                 const playPromise = audio.play();
                 if (playPromise !== undefined) {
-                    playPromise.catch(error => {
+                    playPromise.then(() => {
+                        console.log('Audio started playing');
+                    }).catch(error => {
                         if (error.name !== 'AbortError') {
                             console.error("Audio playback failed:", error);
                         }
@@ -110,7 +134,7 @@ function Generate(){
             
             setAnalyser(null);
         };
-    }, [user]);
+    }, [user, audioPlayed]);
 
     useEffect(() => {
         if (audioRef.current) {
@@ -129,9 +153,51 @@ function Generate(){
         setHeadphonesOn(!headphonesOn);
     };
 
-    const handleGenerate = () => {
-        if (!user) return;
-        console.log('Generating with prompt:', prompt);
+    const handleGenerate = async () => {
+        if (!user || !prompt.trim() || isGenerating) return;
+        
+        setIsGenerating(true);
+        
+        // Clear any existing samples from localStorage
+        localStorage.removeItem('generatedSamples');
+        
+        // Navigate to loading page
+        navigate('/loading-page');
+        
+        try {
+            const response = await fetch('http://localhost:5000/api/replicate/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ prompt: prompt.trim() }),
+            });
+            
+            const data = await response.json();
+            
+            if (data.success && data.samples) {
+                // Store samples in localStorage
+                localStorage.setItem('generatedSamples', JSON.stringify({
+                    samples: data.samples,
+                    originalPrompt: data.originalPrompt,
+                    correctedPrompt: data.correctedPrompt,
+                    timestamp: Date.now()
+                }));
+                
+                // Navigate to sample generated page
+                navigate('/sample-generated');
+            } else {
+                console.error('Generation failed:', data.error);
+                alert('Failed to generate samples. Please try again.');
+                navigate('/generate');
+            }
+        } catch (error) {
+            console.error('Error generating samples:', error);
+            alert('Network error. Please check your connection and try again.');
+            navigate('/generate');
+        } finally {
+            setIsGenerating(false);
+        }
     };
 
     const handleLogin = () => {
@@ -266,7 +332,7 @@ function Generate(){
                             </div>
                             <div className="sound-toggle">
                                 <button disabled>
-                                    <HeadphoneOff size={40} strokeWidth={1} color='#666' />
+                                    <X size={40} strokeWidth={1} color='#666' />
                                 </button>
                             </div>
                         </div>
@@ -354,18 +420,24 @@ function Generate(){
                                 value={prompt}
                                 onChange={(e) => setPrompt(e.target.value)}
                                 placeholder="Type something like 'dreamy piano melody with a slow tempo' or 'funky guitar riff with high energy'..."
+                                disabled={isGenerating}
                             />
                         </div>
                         <div className='buttons-prompt'>
                             <button
                                 className="btn-inspiration"
                                 onClick={handleGetInspiration}
+                                disabled={isGenerating}
                             >
                                 <p>Need inspiration?</p>
                             </button>
                             
-                            <button className="btn-generate" onClick={handleGenerate}>
-                                <p>Generate</p>
+                            <button 
+                                className="btn-generate" 
+                                onClick={handleGenerate}
+                                disabled={isGenerating || !prompt.trim()}
+                            >
+                                <p>{isGenerating ? 'Generating...' : 'Generate'}</p>
                                 <ChevronRight size={28} strokeWidth={1} />
                             </button>
                         </div>
@@ -382,7 +454,7 @@ function Generate(){
                     </motion.div>
                     <div className='help-icons'>
                         <div className="tips-toggle">
-                            <button onClick={() => setShowTips(!showTips)}>
+                            <button onClick={() => setShowTips(!showTips)} disabled={isGenerating}>
                             {showTips ? (
                                 <>
                                 <X size={40} strokeWidth={1} color='#fff'/>
@@ -395,14 +467,14 @@ function Generate(){
                             </button>
                         </div>
                         <div className="sound-toggle">
-                            <button onClick={toggleHeadphones}>
+                            <button onClick={toggleHeadphones} disabled={isGenerating}>
                             {headphonesOn ? (
                                 <>
                                 <Headphones size={40} strokeWidth={1} color='#fff' />
                                 </>
                             ) : (
                                 <>
-                                <HeadphoneOff size={40} strokeWidth={1} color='#fff' />
+                                <X size={40} strokeWidth={1} color='#fff' />
                                 </>
                             )}
                             </button>
