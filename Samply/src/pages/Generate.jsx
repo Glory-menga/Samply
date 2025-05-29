@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Nav from '../components/Nav';
 import AnimatedBackground from '../components/background/AnimatedBackground';
-import { ChevronRight, Headphones, Info, CircleX, X, Lock, LogIn } from 'lucide-react';
+import { ChevronRight, Headphones, Info, HeadphoneOff, X, Lock, LogIn } from 'lucide-react';
 import Metaball from '../components/3dObjects/Metaball';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '../supabaseClient';
@@ -158,10 +158,8 @@ function Generate(){
         
         setIsGenerating(true);
         
-        // Clear any existing samples from localStorage
         localStorage.removeItem('generatedSamples');
         
-        // Navigate to loading page
         navigate('/loading-page');
         
         try {
@@ -176,7 +174,6 @@ function Generate(){
             const data = await response.json();
             
             if (data.success && data.samples) {
-                // Store samples in localStorage
                 localStorage.setItem('generatedSamples', JSON.stringify({
                     samples: data.samples,
                     originalPrompt: data.originalPrompt,
@@ -184,7 +181,6 @@ function Generate(){
                     timestamp: Date.now()
                 }));
                 
-                // Navigate to sample generated page
                 navigate('/sample-generated');
             } else {
                 console.error('Generation failed:', data.error);
@@ -474,7 +470,7 @@ function Generate(){
                                 </>
                             ) : (
                                 <>
-                                <X size={40} strokeWidth={1} color='#fff' />
+                                <HeadphoneOff size={40} strokeWidth={1} color='#fff' />
                                 </>
                             )}
                             </button>

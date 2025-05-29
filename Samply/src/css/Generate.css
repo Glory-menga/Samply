@@ -43,7 +43,7 @@
 }
 .prompt{
   display: flex;
-  flex-direction: column;
+  flex-direction: column; 
   justify-content: space-between;
   background: rgba(63, 63, 63, 0.4);
   backdrop-filter: blur(10px);
@@ -81,6 +81,18 @@
   flex-direction: row;
   align-items: flex-end;
   transition: 0.3s;
+}
+.btn-generate:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-generate:disabled p {
+    color: #666;
+}
+
+.btn-generate:disabled svg {
+    color: #666;
 }
 .btn-generate:hover{
   scale: 1.2;
