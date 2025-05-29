@@ -101,6 +101,8 @@
   justify-content: space-between;
 }
 .waveform-container {
+    position: relative;
+    width: 100%;
     height: 40px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -108,7 +110,15 @@
     cursor: pointer;
     transition: all 0.3s ease;
 }
-
+.waveform-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    opacity: 0.7;
+    font-size: 14px;
+}
 .waveform-container:hover {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.2);
@@ -129,12 +139,25 @@
   display: flex;
   flex-direction: column;
   width: 90%;
+  gap: 8px;
+}
+.wave-gen .audio-progress-bar {
+    display: none;
+}
+
+.waveform-gen button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.waveform-container wave {
+    overflow: hidden !important;
 }
 .timestamps-generated-sample{
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  margin-top: 15px;
+  margin-top: 8px;
 }
 .edit-generated-sample{
   display: flex;
@@ -171,4 +194,3 @@
     height: 50px;
     width: 50px;
 }
-

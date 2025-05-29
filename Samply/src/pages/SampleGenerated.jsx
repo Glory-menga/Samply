@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AnimatedBackground from "../components/background/AnimatedBackground";
 import { ArrowDownToLine, Save, Play, Pause } from 'lucide-react';
 import Metaball from '../components/3dObjects/Metaball';
+import WaveSurfer from 'wavesurfer.js';
 import '../css/SampleGenerated.css';
 
 function SampleGenerated(){
@@ -14,14 +15,16 @@ function SampleGenerated(){
     const [currentTime, setCurrentTime] = useState([0, 0]);
     const [duration, setDuration] = useState([0, 0]);
     const [loading, setLoading] = useState(true);
-    const audioRefs = useRef([]);
+    const [wavesurferReady, setWavesurferReady] = useState([false, false]);
+    const [loadingErrors, setLoadingErrors] = useState([null, null]);
+    
+    const waveformRefs = useRef([]);
+    const wavesurferRefs = useRef([]);
 
     useEffect(() => {
-        // Load samples from localStorage
         const storedSamples = localStorage.getItem('generatedSamples');
         
         if (!storedSamples) {
-            // If no samples found, redirect to generate page
             navigate('/generate');
             return;
         }
@@ -32,10 +35,12 @@ function SampleGenerated(){
             setOriginalPrompt(data.originalPrompt || '');
             setCorrectedPrompt(data.correctedPrompt || '');
             
-            // Initialize audio refs
-            audioRefs.current = new Array(data.samples?.length || 0).fill(null);
+            waveformRefs.current = new Array(data.samples?.length || 0).fill(null);
+            wavesurferRefs.current = new Array(data.samples?.length || 0).fill(null);
             setCurrentTime(new Array(data.samples?.length || 0).fill(0));
             setDuration(new Array(data.samples?.length || 0).fill(0));
+            setWavesurferReady(new Array(data.samples?.length || 0).fill(false));
+            setLoadingErrors(new Array(data.samples?.length || 0).fill(null));
         } catch (error) {
             console.error('Error parsing stored samples:', error);
             navigate('/generate');
@@ -44,57 +49,153 @@ function SampleGenerated(){
         }
     }, [navigate]);
 
-    const handlePlay = async (index) => {
-        const sample = samples[index];
-        if (!sample || !sample.audio) return;
+    useEffect(() => {
+        if (samples.length > 0) {
+            samples.forEach((sample, index) => {
+                if (sample && sample.audio && waveformRefs.current[index] && !wavesurferRefs.current[index]) {
+                    try {
+                        const wavesurfer = WaveSurfer.create({
+                            container: waveformRefs.current[index],
+                            waveColor: '#ffffff',
+                            progressColor: '#212121',
+                            cursorColor: '#000000',
+                            barWidth: 1,
+                            responsive: true,
+                            height: 60,
+                            normalize: true,
+                            backend: 'WebAudio',
+                            interact: true,
+                            mediaControls: false,
+                            audioRate: 1,
+                            xhr: {
+                                cache: 'default',
+                                mode: 'cors',
+                                credentials: 'omit',
+                                headers: [
+                                    { key: 'cache-control', value: 'no-cache' }
+                                ]
+                            }
+                        });
 
-        // Pause any currently playing audio
-        if (playingIndex !== null && audioRefs.current[playingIndex]) {
-            audioRefs.current[playingIndex].pause();
+                        const proxyUrl = `http://localhost:5000/api/replicate/proxy-audio?url=${encodeURIComponent(sample.audio)}`;
+                        
+                        wavesurfer.load(proxyUrl);
+
+                        wavesurfer.on('ready', () => {
+                            setWavesurferReady(prev => {
+                                const newReady = [...prev];
+                                newReady[index] = true;
+                                return newReady;
+                            });
+                            
+                            setDuration(prev => {
+                                const newDuration = [...prev];
+                                newDuration[index] = wavesurfer.getDuration();
+                                return newDuration;
+                            });
+                            
+                            setLoadingErrors(prev => {
+                                const newErrors = [...prev];
+                                newErrors[index] = null;
+                                return newErrors;
+                            });
+                            
+                            setTimeout(() => {
+                                wavesurfer.drawBuffer();
+                            }, 100);
+                        });
+
+                        wavesurfer.on('error', (error) => {
+                            console.error(`WaveSurfer error for sample ${index}:`, error);
+                            const newErrors = [...loadingErrors];
+                            newErrors[index] = `Failed to load audio: ${error}`;
+                            setLoadingErrors(newErrors);
+                            
+                            const newReady = [...wavesurferReady];
+                            newReady[index] = false;
+                            setWavesurferReady(newReady);
+                        });
+
+                        wavesurfer.on('audioprocess', () => {
+                            const newCurrentTime = [...currentTime];
+                            newCurrentTime[index] = wavesurfer.getCurrentTime();
+                            setCurrentTime(newCurrentTime);
+                        });
+
+                        wavesurfer.on('seek', () => {
+                            const newCurrentTime = [...currentTime];
+                            newCurrentTime[index] = wavesurfer.getCurrentTime();
+                            setCurrentTime(newCurrentTime);
+                        });
+
+                        wavesurfer.on('play', () => {
+                            setPlayingIndex(index);
+                        });
+
+                        wavesurfer.on('pause', () => {
+                            if (playingIndex === index) {
+                                setPlayingIndex(null);
+                            }
+                        });
+
+                        wavesurfer.on('finish', () => {
+                            setPlayingIndex(null);
+                        });
+
+                        wavesurfer.on('interaction', (time) => {
+                            setCurrentTime(prev => {
+                                const newTime = [...prev];
+                                newTime[index] = time;
+                                return newTime;
+                            });
+                        });
+
+                        fetch(proxyUrl, { method: 'HEAD' })
+                            .then(response => {
+                                if (!response.ok) {
+                                    console.error(`Audio URL not accessible for sample ${index}`);
+                                }
+                            })
+                            .catch(error => {
+                                console.error(`Failed to test audio URL for sample ${index}:`, error);
+                            });
+
+                        wavesurferRefs.current[index] = wavesurfer;
+                    } catch (error) {
+                        console.error(`Failed to create WaveSurfer for sample ${index}:`, error);
+                        const newErrors = [...loadingErrors];
+                        newErrors[index] = `Failed to initialize audio player: ${error.message}`;
+                        setLoadingErrors(newErrors);
+                    }
+                }
+            });
         }
 
-        if (playingIndex === index) {
-            // If same audio is playing, pause it
-            setPlayingIndex(null);
+        return () => {
+            wavesurferRefs.current.forEach(wavesurfer => {
+                if (wavesurfer) {
+                    wavesurfer.destroy();
+                }
+            });
+        };
+    }, [samples]);
+
+    const handlePlay = async (index) => {
+        const wavesurfer = wavesurferRefs.current[index];
+        if (!wavesurfer || !wavesurferReady[index]) {
             return;
         }
 
-        try {
-            // Create new audio element if it doesn't exist
-            if (!audioRefs.current[index]) {
-                const audio = new Audio();
-                audio.crossOrigin = "anonymous";
-                
-                // Use proxy endpoint to avoid CORS issues
-                audio.src = `http://localhost:5000/api/replicate/proxy-audio?url=${encodeURIComponent(sample.audio)}`;
-                
-                audio.addEventListener('loadedmetadata', () => {
-                    const newDuration = [...duration];
-                    newDuration[index] = audio.duration;
-                    setDuration(newDuration);
-                });
+        if (playingIndex !== null && playingIndex !== index && wavesurferRefs.current[playingIndex]) {
+            wavesurferRefs.current[playingIndex].pause();
+        }
 
-                audio.addEventListener('timeupdate', () => {
-                    const newCurrentTime = [...currentTime];
-                    newCurrentTime[index] = audio.currentTime;
-                    setCurrentTime(newCurrentTime);
-                });
-
-                audio.addEventListener('ended', () => {
-                    setPlayingIndex(null);
-                    const newCurrentTime = [...currentTime];
-                    newCurrentTime[index] = 0;
-                    setCurrentTime(newCurrentTime);
-                });
-
-                audioRefs.current[index] = audio;
-            }
-
-            await audioRefs.current[index].play();
+        if (playingIndex === index) {
+            wavesurfer.pause();
+            setPlayingIndex(null);
+        } else {
+            wavesurfer.play();
             setPlayingIndex(index);
-        } catch (error) {
-            console.error('Error playing audio:', error);
-            alert('Failed to play audio. Please try again.');
         }
     };
 
@@ -121,7 +222,6 @@ function SampleGenerated(){
     };
 
     const handleSave = (index) => {
-        // For now, just show an alert. You can implement your save logic here
         alert('Save functionality will be implemented based on your requirements.');
     };
 
@@ -132,9 +232,26 @@ function SampleGenerated(){
     };
 
     const handleGenerateNew = () => {
-        // Clear stored samples and navigate to generate page
         localStorage.removeItem('generatedSamples');
         navigate('/generate');
+    };
+
+    const handleRetryLoad = (index) => {
+        const wavesurfer = wavesurferRefs.current[index];
+        if (wavesurfer) {
+            wavesurfer.destroy();
+            wavesurferRefs.current[index] = null;
+            
+            const newErrors = [...loadingErrors];
+            newErrors[index] = null;
+            setLoadingErrors(newErrors);
+            
+            const newReady = [...wavesurferReady];
+            newReady[index] = false;
+            setWavesurferReady(newReady);
+            
+            setSamples([...samples]);
+        }
     };
 
     if (loading) {
@@ -200,7 +317,11 @@ function SampleGenerated(){
                                         </div>
                                         <div className='wave-generated-sample'>
                                             <div className='waveform-gen'>
-                                                <button onClick={() => handlePlay(index)}>
+                                                <button 
+                                                    onClick={() => handlePlay(index)}
+                                                    disabled={!wavesurferReady[index]}
+                                                    className={!wavesurferReady[index] ? 'disabled' : ''}
+                                                >
                                                     {playingIndex === index ? (
                                                         <Pause size={40} strokeWidth={1} color='#fff' fill='#fff'/>
                                                     ) : (
@@ -208,15 +329,22 @@ function SampleGenerated(){
                                                     )}
                                                 </button>
                                                 <div className='wave-gen'>
-                                                    <div className='audio-progress-bar'>
-                                                        <div 
-                                                            className='audio-progress' 
-                                                            style={{
-                                                                width: duration[index] > 0 
-                                                                    ? `${(currentTime[index] / duration[index]) * 100}%` 
-                                                                    : '0%'
-                                                            }}
-                                                        ></div>
+                                                    <div 
+                                                        ref={el => waveformRefs.current[index] = el}
+                                                        className='waveform-container'
+                                                        style={{ width: '100%', minHeight: '60px' }}
+                                                    >
+                                                        {!wavesurferReady[index] && !loadingErrors[index] && (
+                                                            <div className='waveform-loading'>Loading waveform...</div>
+                                                        )}
+                                                        {loadingErrors[index] && (
+                                                            <div className='waveform-error'>
+                                                                <p>{loadingErrors[index]}</p>
+                                                                <button onClick={() => handleRetryLoad(index)} className='retry-button'>
+                                                                    Retry
+                                                                </button>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div className='timestamps-generated-sample'>
                                                         <p>{formatTime(currentTime[index] || 0)}</p>
