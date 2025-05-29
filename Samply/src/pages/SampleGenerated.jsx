@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import AnimatedBackground from "../components/background/AnimatedBackground";
 import { ArrowDownToLine, Save, Play, Pause } from 'lucide-react';
 import Metaball from '../components/3dObjects/Metaball';
@@ -20,6 +21,47 @@ function SampleGenerated(){
     
     const waveformRefs = useRef([]);
     const wavesurferRefs = useRef([]);
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.3
+            }
+        }
+    };
+
+    const sampleVariants = {
+        hidden: { 
+            opacity: 0, 
+            y: 50 
+        },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: {
+                duration: 0.6,
+                ease: "easeOut"
+            }
+        }
+    };
+
+    const promptVariants = {
+        hidden: { 
+            opacity: 0, 
+            y: 30 
+        },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: {
+                duration: 0.6,
+                ease: "easeOut",
+                delay: 1
+            }
+        }
+    };
 
     useEffect(() => {
         const storedSamples = localStorage.getItem('generatedSamples');
@@ -293,13 +335,27 @@ function SampleGenerated(){
                     </button>
                 </div>
                 <div className='sample-generated-wrapper'>
-                    <div className='intro-sample-generated'>
+                    <motion.div 
+                        className='intro-sample-generated'
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, ease: "easeOut" }}
+                    >
                         <h1>Choose Your Sound: Two Unique Samples Await</h1>
-                    </div>
-                    <div className='generated-samples'>
+                    </motion.div>
+                    <motion.div 
+                        className='generated-samples'
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
                         <div className='generated-sample'>
                             {samples.map((sample, index) => (
-                                <div key={index} className='sample-gen'>
+                                <motion.div 
+                                    key={index} 
+                                    className='sample-gen'
+                                    variants={sampleVariants}
+                                >
                                     <div className='audio-generated-sample'>
                                         <div className='intro-audio-gen'>
                                             <div className='name-generated-sample'>
@@ -363,15 +419,20 @@ function SampleGenerated(){
                                     <div className='post-gen-sample'>
                                         <p>Publish Now</p>
                                     </div>
-                                </div>
+                                </motion.div>
                             ))}
                         </div>
-                        <div className='generated-prompt'>
+                        <motion.div 
+                            className='generated-prompt'
+                            variants={promptVariants}
+                            initial="hidden"
+                            animate="visible"
+                        >
                             <div className='gen-prompt'>
-                                <p> {correctedPrompt}</p>
+                                <p>{correctedPrompt}</p>
                             </div>
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
                 </div>
             </div>
         </>
