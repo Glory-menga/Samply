@@ -12,6 +12,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Profile from './pages/Profile';
 import LoadingPage from './components/LoadingPage';
+import LoadingDownload from './components/LoadingDownload';
 import NotFound from './pages/NotFound';
 import RedirectIfLoggedIn from './components/RedirectIfLoggedIn';
 import { UserProvider } from './context/UserContext';
@@ -65,6 +66,7 @@ function App() {
             />
             <Route path="/profile" element={<Profile />} />
             <Route path="/loading-page" element={<LoadingPage />} />
+            <Route path="/loading-download" element={<LoadingDownload />} />
             {/*Error Page*/}
             <Route path="*" element={<NotFound />} />
           </Routes>
