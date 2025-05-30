@@ -81,7 +81,22 @@ function Home() {
     setIsHovering(hovering);
   };
 
-  // Animation variants for metaball
+  const h1Variants = {
+    hidden: {
+      opacity: 0,
+      y: -30,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.8,
+        ease: "easeOut",
+        delay: 0.1
+      }
+    }
+  };
+
   const metaballVariants = {
     hidden: {
       opacity: 0,
@@ -98,7 +113,6 @@ function Home() {
     }
   };
 
-  // Animation variants for hover effect
   const metaballHoverVariants = {
     hover: {
       scale: 1.1,
@@ -118,7 +132,13 @@ function Home() {
       <div className="container-space">
         <div className='cta'>
           <div className="heading-container">
-            <h1>Generate. Create. Inspire.</h1>
+            <motion.h1
+              initial="hidden"
+              animate="visible"
+              variants={h1Variants}
+            >
+              Generate. Create. Inspire.
+            </motion.h1>
             <motion.div 
               className='metaball'
               onMouseEnter={() => handleMetaballHover(true)}

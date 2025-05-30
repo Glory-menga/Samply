@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import Galaxy from '../components/3dObjects/Galaxy';
 import { Play } from 'lucide-react';
 import Metaball from '../components/3dObjects/Metaball';
@@ -24,7 +25,13 @@ function EditSample(){
                     <button onClick={() => navigate(-1)}> <p>Back to the generated samples</p></button>
                 </div>
                 <div className='edit-sample-wrapper'>
-                    <h1>Jazzy melody with a slow tempo</h1>
+                    <motion.h1
+                        initial={{ opacity: 0, y: -50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                    >
+                        Jazzy melody with a slow tempo
+                    </motion.h1>
                     <div className='edit-metaball'>
                         <div className='edit-pitch-semitones'>
                             <Knob />
@@ -43,9 +50,18 @@ function EditSample(){
                             <p>Reverse: OFF</p>
                             </div>
                         </div>
-                        <div className='placement-metaball'>
+                        <motion.div 
+                            className='placement-metaball'
+                            initial={{ opacity: 0, y: 50 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ 
+                                duration: 0.8, 
+                                ease: "easeOut",
+                                delay: 0.3 
+                            }}
+                        >
                             <Metaball width="100%" height="100%" sphereScale={1.4}/>
-                        </div>
+                        </motion.div>
                         <div className='edit-tempo'>
                             <div className="tempo-slider-wrapper">
                             <input
