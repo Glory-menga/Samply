@@ -30,7 +30,6 @@ function EditSample(){
     const animationFrameRef = useRef(null);
     
     const tempoLevels = ['Very Fast', 'Fast', 'Normal', 'Slow', 'Very Slow'];
-    // Tempo multipliers: Very Fast = 2x, Fast = 1.5x, Normal = 1x, Slow = 0.75x, Very Slow = 0.5x
     const tempoMultipliers = [2, 1.5, 1, 0.75, 0.5];
 
     useEffect(() => {
@@ -72,7 +71,6 @@ function EditSample(){
         }
     }, [pitchShift]);
 
-    // Effect to handle tempo changes
     useEffect(() => {
         if (playerRef.current && audioLoaded) {
             const playbackRate = tempoMultipliers[tempoValue];
@@ -111,7 +109,7 @@ function EditSample(){
                 url: proxyUrl,
                 loop: isLooping,
                 reverse: reverse,
-                playbackRate: tempoMultipliers[tempoValue], // Set initial tempo
+                playbackRate: tempoMultipliers[tempoValue], 
                 onload: () => {
                     setDuration(playerRef.current.buffer.duration);
                     setAudioLoaded(true);
@@ -181,7 +179,7 @@ function EditSample(){
                 const updateTime = () => {
                     if (playerRef.current && playerRef.current.state === 'started') {
                         const elapsed = Tone.now() - startTime;
-                        const adjustedDuration = duration / tempoMultipliers[tempoValue]; // Adjust duration based on tempo
+                        const adjustedDuration = duration / tempoMultipliers[tempoValue]; 
                         
                         if (elapsed >= adjustedDuration) {
                             if (isLooping) {
@@ -252,12 +250,10 @@ function EditSample(){
 
     const handlePitchChange = (value) => {
         setPitchShift(value);
-        // Removed console.log message
     };
 
     const handleTempoChange = (value) => {
         setTempoValue(value);
-        // If currently playing, update playback rate immediately
         if (playerRef.current && audioLoaded) {
             playerRef.current.playbackRate = tempoMultipliers[value];
         }
