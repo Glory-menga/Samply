@@ -267,6 +267,23 @@ function SampleGenerated(){
         alert('Save functionality will be implemented based on your requirements.');
     };
 
+    const handleEditSample = (index) => {
+        const sample = samples[index];
+        if (!sample) return;
+
+        const editSampleData = {
+            sample: sample,
+            index: index,
+            allSamples: samples,
+            originalPrompt: originalPrompt,
+            correctedPrompt: correctedPrompt
+        };
+        
+        localStorage.setItem('editSampleData', JSON.stringify(editSampleData));
+        
+        navigate('/edit-sample');
+    };
+
     const formatTime = (seconds) => {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = Math.floor(seconds % 60);
@@ -408,7 +425,7 @@ function SampleGenerated(){
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className='edit-generated-sample'>
+                                            <div className='edit-generated-sample' onClick={() => handleEditSample(index)}>
                                                 <div className='gen-metaball'>
                                                     <Metaball />
                                                 </div>
