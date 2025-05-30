@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Galaxy from '../components/3dObjects/Galaxy';
-import { Play, Pause } from 'lucide-react';
+import { Play, Square } from 'lucide-react';
 import Metaball from '../components/3dObjects/Metaball';
 import Knob from '../components/Knob';
 import * as Checkbox from '@radix-ui/react-checkbox';
 import { CheckIcon } from '@radix-ui/react-icons';
 import { Save, ArrowDownToLine } from 'lucide-react';
+import * as Tone from 'tone';
 import '../css/EditSample.css';
 
 function EditSample(){
@@ -20,13 +21,17 @@ function EditSample(){
     const [isLooping, setIsLooping] = useState(true);
     const [audioLoaded, setAudioLoaded] = useState(false);
     const [reverse, setReverse] = useState(false);
+    const [pitchShift, setPitchShift] = useState(0); 
     
-    const audioRef = useRef(null);
-    const audioContextRef = useRef(null);
+    const playerRef = useRef(null);
+    const pitchShiftRef = useRef(null);
     const analyserRef = useRef(null);
+    const webAudioAnalyserRef = useRef(null);
     const animationFrameRef = useRef(null);
     
     const tempoLevels = ['Very Fast', 'Fast', 'Normal', 'Slow', 'Very Slow'];
+    // Tempo multipliers: Very Fast = 2x, Fast = 1.5x, Normal = 1x, Slow = 0.75x, Very Slow = 0.5x
+    const tempoMultipliers = [2, 1.5, 1, 0.75, 0.5];
 
     useEffect(() => {
         const storedSampleData = localStorage.getItem('editSampleData');
@@ -51,52 +56,101 @@ function EditSample(){
         }
 
         return () => {
-            if (animationFrameRef.current) {
-                cancelAnimationFrame(animationFrameRef.current);
-            }
-            if (audioContextRef.current) {
-                audioContextRef.current.close();
-            }
+            cleanup();
         };
     }, [sampleData]);
 
+    useEffect(() => {
+        if (playerRef.current && audioLoaded) {
+            playerRef.current.reverse = reverse;
+        }
+    }, [reverse, audioLoaded]);
+
+    useEffect(() => {
+        if (pitchShiftRef.current) {
+            pitchShiftRef.current.pitch = pitchShift;
+        }
+    }, [pitchShift]);
+
+    // Effect to handle tempo changes
+    useEffect(() => {
+        if (playerRef.current && audioLoaded) {
+            const playbackRate = tempoMultipliers[tempoValue];
+            playerRef.current.playbackRate = playbackRate;
+        }
+    }, [tempoValue, audioLoaded]);
+
+    const cleanup = () => {
+        if (animationFrameRef.current) {
+            cancelAnimationFrame(animationFrameRef.current);
+        }
+        if (playerRef.current) {
+            playerRef.current.dispose();
+            playerRef.current = null;
+        }
+        if (pitchShiftRef.current) {
+            pitchShiftRef.current.dispose();
+            pitchShiftRef.current = null;
+        }
+        if (analyserRef.current) {
+            analyserRef.current.dispose();
+            analyserRef.current = null;
+        }
+        if (webAudioAnalyserRef.current) {
+            webAudioAnalyserRef.current = null;
+        }
+    };
+
     const initializeAudio = async () => {
         try {
+            cleanup();
+
             const proxyUrl = `http://localhost:5000/api/replicate/proxy-audio?url=${encodeURIComponent(sampleData.sample.audio)}`;
             
-            // Create audio element
-            const audio = new Audio();
-            audio.crossOrigin = 'anonymous';
-            audio.loop = isLooping;
-            
-            audio.addEventListener('loadedmetadata', () => {
-                setDuration(audio.duration);
-                setAudioLoaded(true);
-            });
-
-            audio.addEventListener('timeupdate', () => {
-                setCurrentTime(audio.currentTime);
-            });
-
-            audio.addEventListener('ended', () => {
-                if (!isLooping) {
-                    setIsPlaying(false);
+            playerRef.current = new Tone.Player({
+                url: proxyUrl,
+                loop: isLooping,
+                reverse: reverse,
+                playbackRate: tempoMultipliers[tempoValue], // Set initial tempo
+                onload: () => {
+                    setDuration(playerRef.current.buffer.duration);
+                    setAudioLoaded(true);
+                    console.log('Audio loaded successfully');
+                },
+                onerror: (error) => {
+                    console.error('Error loading audio:', error);
                 }
             });
 
-            audio.src = proxyUrl;
-            audioRef.current = audio;
+            pitchShiftRef.current = new Tone.PitchShift({
+                pitch: pitchShift,
+                windowSize: 0.1,
+                overlap: 0.25,
+                delayTime: 0
+            });
 
-            // Create Web Audio API context for visualization
-            if (!audioContextRef.current) {
-                audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-                const source = audioContextRef.current.createMediaElementSource(audio);
-                analyserRef.current = audioContextRef.current.createAnalyser();
-                analyserRef.current.fftSize = 256;
-                
-                source.connect(analyserRef.current);
-                analyserRef.current.connect(audioContextRef.current.destination);
-            }
+            analyserRef.current = new Tone.Analyser('waveform', 256);
+
+            const audioContext = Tone.getContext().rawContext;
+            webAudioAnalyserRef.current = audioContext.createAnalyser();
+            webAudioAnalyserRef.current.fftSize = 256;
+            webAudioAnalyserRef.current.smoothingTimeConstant = 0.8;
+
+            playerRef.current.connect(pitchShiftRef.current);
+            pitchShiftRef.current.toDestination();
+            
+            pitchShiftRef.current.connect(analyserRef.current);
+            
+            const toneNode = pitchShiftRef.current.output;
+            toneNode.connect(webAudioAnalyserRef.current);
+
+            playerRef.current.onstop = () => {
+                setIsPlaying(false);
+                setCurrentTime(0);
+                if (animationFrameRef.current) {
+                    cancelAnimationFrame(animationFrameRef.current);
+                }
+            };
 
         } catch (error) {
             console.error('Error initializing audio:', error);
@@ -104,19 +158,52 @@ function EditSample(){
     };
 
     const handlePlayPause = async () => {
-        if (!audioRef.current || !audioLoaded) return;
+        if (!playerRef.current || !audioLoaded) return;
 
         try {
-            if (audioContextRef.current.state === 'suspended') {
-                await audioContextRef.current.resume();
+            if (Tone.context.state !== 'running') {
+                await Tone.start();
             }
 
             if (isPlaying) {
-                audioRef.current.pause();
+                playerRef.current.stop();
+                Tone.Transport.stop();
                 setIsPlaying(false);
+                if (animationFrameRef.current) {
+                    cancelAnimationFrame(animationFrameRef.current);
+                }
             } else {
-                await audioRef.current.play();
+                Tone.Transport.start();
+                playerRef.current.start();
                 setIsPlaying(true);
+                
+                let startTime = Tone.now();
+                const updateTime = () => {
+                    if (playerRef.current && playerRef.current.state === 'started') {
+                        const elapsed = Tone.now() - startTime;
+                        const adjustedDuration = duration / tempoMultipliers[tempoValue]; // Adjust duration based on tempo
+                        
+                        if (elapsed >= adjustedDuration) {
+                            if (isLooping) {
+                                startTime = Tone.now();
+                                setCurrentTime(0);
+                            } else {
+                                playerRef.current.stop();
+                                setIsPlaying(false);
+                                setCurrentTime(0);
+                                return;
+                            }
+                        } else {
+                            setCurrentTime(elapsed);
+                        }
+                        
+                        animationFrameRef.current = requestAnimationFrame(updateTime);
+                    } else {
+                        setIsPlaying(false);
+                        setCurrentTime(0);
+                    }
+                };
+                updateTime();
             }
         } catch (error) {
             console.error('Error playing audio:', error);
@@ -156,12 +243,29 @@ function EditSample(){
 
     const handleReverseToggle = (checked) => {
         setReverse(checked);
-        console.log("Reverse is", checked ? "ON" : "OFF");
+        
+        if (isPlaying && playerRef.current) {
+            playerRef.current.stop();
+            setIsPlaying(false);
+        }
+    };
+
+    const handlePitchChange = (value) => {
+        setPitchShift(value);
+        // Removed console.log message
+    };
+
+    const handleTempoChange = (value) => {
+        setTempoValue(value);
+        // If currently playing, update playback rate immediately
+        if (playerRef.current && audioLoaded) {
+            playerRef.current.playbackRate = tempoMultipliers[value];
+        }
     };
 
     useEffect(() => {
-        if (audioRef.current) {
-            audioRef.current.loop = isLooping;
+        if (playerRef.current) {
+            playerRef.current.loop = isLooping;
         }
     }, [isLooping]);
 
@@ -201,7 +305,7 @@ function EditSample(){
                     </motion.h1>
                     <div className='edit-metaball'>
                         <div className='edit-pitch-semitones'>
-                            <Knob />
+                            <Knob onChange={handlePitchChange} />
                             <div className='reverse-toggle'> 
                                 <Checkbox.Root
                                     className="checkbox-custom"
@@ -230,7 +334,7 @@ function EditSample(){
                                 width="100%" 
                                 height="100%" 
                                 sphereScale={1.4}
-                                analyser={analyserRef.current}
+                                analyser={webAudioAnalyserRef.current}
                                 animationSpeed={isPlaying ? 1.5 : 0.3}
                                 isHovering={isPlaying}
                             />
@@ -243,7 +347,7 @@ function EditSample(){
                                     max="4"
                                     step="1"
                                     value={4 - tempoValue}
-                                    onChange={(e) => setTempoValue(4 - Number(e.target.value))}
+                                    onChange={(e) => handleTempoChange(4 - Number(e.target.value))}
                                     className="tempo-slider"
                                 />
                                 <p className="tempo-label">Tempo : {tempoLevels[tempoValue]}</p>
@@ -257,7 +361,7 @@ function EditSample(){
                             className={!audioLoaded ? 'disabled' : ''}
                         >
                             {isPlaying ? (
-                                <Pause size={32} strokeWidth={1} color='#fff' fill='#fff'/>
+                                <Square  size={32} strokeWidth={1} color='#fff' fill='#fff'/>
                             ) : (
                                 <Play size={32} strokeWidth={1} color='#fff' fill='#fff'/>
                             )}
@@ -265,7 +369,7 @@ function EditSample(){
                         <div className='time-sample'>
                             <p>{formatTime(currentTime)}</p>
                             <p>/</p>
-                            <p>{formatTime(duration)}</p>
+                            <p>{formatTime(duration / tempoMultipliers[tempoValue])}</p>
                         </div>
                         <div className='loop-toggle'>
                             <Checkbox.Root
