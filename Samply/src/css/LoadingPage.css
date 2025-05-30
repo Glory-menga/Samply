@@ -11,6 +11,22 @@
     margin-top: 40px;
     font-size: 22px
 }
+.loading-text-container {
+  min-height: 60px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.loading-text-container p {
+  position: absolute;
+  width: 100%;
+  margin: 0;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
 .metaballs-loading{
     display: flex;
     flex-direction: row;
