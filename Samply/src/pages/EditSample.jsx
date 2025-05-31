@@ -566,10 +566,19 @@ function EditSample(){
             </div>
             {isDownloading && (
                 <div className="download-overlay">
-                    <div className="download-message">
+                    <motion.div 
+                        className="download-message"
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 50 }}
+                        transition={{ 
+                            duration: 0.5, 
+                            ease: "easeOut" 
+                        }}
+                    >
                         <LoaderCircle size={48} strokeWidth={1} color='#fff' className="download-spinner-large"/>
                         <p>Recording and downloading edited sample...</p>
-                    </div>
+                    </motion.div>
                 </div>
             )}
         </>
