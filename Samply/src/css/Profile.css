@@ -260,3 +260,130 @@
     width: 100%;
     left: 0; 
 }
+
+/* Disconnect Modal Styles */
+.disconnect-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+}
+
+.disconnect-modal-content {
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.disconnect-modal-header {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.disconnect-modal-header h2 {
+    color: #fff;
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.disconnect-modal-body {
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.disconnect-modal-body p {
+    color: #e0e0e0;
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 8px 0;
+}
+
+.disconnect-modal-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+
+.btn-cancel,
+.btn-disconnect {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-cancel {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-disconnect {
+    background: #7b1c1c;
+    color: white;
+    border: 1px solid #7b1c1c;
+}
+
+.btn-disconnect:hover {
+    background: #9f2828;
+    border-color: #9f2828;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(207, 0, 0, 0.3);
+}
+
+.btn-cancel:disabled,
+.btn-disconnect:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-disconnect:disabled:hover {
+    background: #9f2828;
+    border-color: #9f2828;
+    box-shadow: none;
+}
+
+.disconnect-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
+}
+
+/* Animations */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+

@@ -189,4 +189,102 @@ router.get('/samples/:id', async (req, res) => {
   }
 });
 
+router.get('/user-samples/:user_id', async (req, res) => {
+  try {
+    const { user_id } = req.params;
+
+    const { data: samples, error } = await supabase
+      .from('samples')
+      .select('*')
+      .eq('user_id', user_id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      return res.status(500).json({ 
+        error: 'Failed to fetch user samples',
+        details: error.message 
+      });
+    }
+
+    res.json({ samples });
+  } catch (error) {
+    console.error('Fetch user samples error:', error);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
+    });
+  }
+});
+
+router.delete('/samples/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { user_id } = req.body;
+
+    if (!user_id) {
+      return res.status(400).json({ 
+        error: 'User ID is required for deletion' 
+      });
+    }
+
+    const { data: sample, error: fetchError } = await supabase
+      .from('samples')
+      .select('*')
+      .eq('id', id)
+      .eq('user_id', user_id) 
+      .single();
+
+    if (fetchError || !sample) {
+      return res.status(404).json({ 
+        error: 'Sample not found or you do not have permission to delete it' 
+      });
+    }
+
+    const { error: deleteError } = await supabaseAdmin
+      .from('samples')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', user_id);
+
+    if (deleteError) {
+      console.error('Database delete error:', deleteError);
+      return res.status(500).json({ 
+        error: 'Failed to delete sample from database',
+        details: deleteError.message 
+      });
+    }
+
+    if (sample.sample_url) {
+      try {
+        const urlParts = sample.sample_url.split('/');
+        const filename = urlParts[urlParts.length - 1];
+        
+        if (filename && filename !== 'undefined') {
+          const { error: storageError } = await supabaseAdmin.storage
+            .from('samples')
+            .remove([`Samples/${filename}`]);
+
+          if (storageError) {
+            console.warn('Storage delete warning:', storageError);
+          }
+        }
+      } catch (storageError) {
+        console.warn('Error deleting from storage:', storageError);
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Sample "${sample.title}" deleted successfully!`
+    });
+
+  } catch (error) {
+    console.error('Delete sample error:', error);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
+    });
+  }
+});
+
 export default router;

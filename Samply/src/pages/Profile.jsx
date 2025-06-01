@@ -7,7 +7,64 @@ import '../css/Profile.css';
 import AnimatedBackground from "../components/background/AnimatedBackground";
 import Nav from '../components/Nav';
 import { Eye, EyeOff, Pen, X, Check, CircleUser } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const DisconnectConfirmationModal = ({ isOpen, onConfirm, onCancel, isDisconnecting }) => {
+    if (!isOpen) return null;
+
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <motion.div 
+                    className="disconnect-modal-overlay"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    <motion.div 
+                        className="disconnect-modal-content"
+                        initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                        transition={{ duration: 0.3, type: "spring", damping: 20 }}
+                    >
+                        <div className="disconnect-modal-header">
+                            <h2>Disconnect Account</h2>
+                        </div>
+                        <div className="disconnect-modal-body">
+                            <p>Are you sure you want to disconnect from your account?</p>
+                            <p>You will be logged out and redirected to the login page.</p>
+                        </div>
+                        <div className="disconnect-modal-actions">
+                            <button 
+                                className="btn-cancel"
+                                onClick={onCancel}
+                                disabled={isDisconnecting}
+                            >
+                                No, Stay Connected
+                            </button>
+                            <button 
+                                className="btn-disconnect"
+                                onClick={onConfirm}
+                                disabled={isDisconnecting}
+                            >
+                                {isDisconnecting ? (
+                                    <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                                        <div className="disconnect-spinner"></div>
+                                        Disconnecting...
+                                    </div>
+                                ) : (
+                                    'Yes, Disconnect'
+                                )}
+                            </button>
+                        </div>
+                    </motion.div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    );
+};
 
 function Profile() {
     const navigate = useNavigate();
@@ -31,6 +88,11 @@ function Profile() {
     const [hasNameChanged, setHasNameChanged] = useState(false);
     const [hasPasswordChanged, setHasPasswordChanged] = useState(false);
     const [hasImageChanged, setHasImageChanged] = useState(false);
+
+    const [disconnectModal, setDisconnectModal] = useState({
+        isOpen: false,
+        isDisconnecting: false
+    });
 
     useEffect(() => {
         if (user) {
@@ -326,13 +388,38 @@ function Profile() {
         e.preventDefault();
     };
 
-    const handleLogout = async () => {
-        const { error } = await supabase.auth.signOut();
-        if (error) {
+    const openDisconnectModal = () => {
+        setDisconnectModal({
+            isOpen: true,
+            isDisconnecting: false
+        });
+    };
+
+    const closeDisconnectModal = () => {
+        if (disconnectModal.isDisconnecting) return; 
+        setDisconnectModal({
+            isOpen: false,
+            isDisconnecting: false
+        });
+    };
+
+    const confirmDisconnect = async () => {
+        setDisconnectModal(prev => ({ ...prev, isDisconnecting: true }));
+        
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                toast.error("Failed to disconnect.");
+                setDisconnectModal(prev => ({ ...prev, isDisconnecting: false }));
+            } else {
+                toast.success("See you next time!");
+                closeDisconnectModal();
+                navigate("/login");
+            }
+        } catch (error) {
+            console.error('Disconnect error:', error);
             toast.error("Failed to disconnect.");
-        } else {
-            toast.success("See you next time!");
-            navigate("/login");
+            setDisconnectModal(prev => ({ ...prev, isDisconnecting: false }));
         }
     };
 
@@ -492,7 +579,7 @@ function Profile() {
                         </div>
                         <div className='disconnect-save'>
                             <div className='disconnect'>
-                                <button onClick={handleLogout}>
+                                <button onClick={openDisconnectModal}>
                                     <X size={40} strokeWidth={1} color='#CF0000' />
                                     <p>Disconnect</p>
                                 </button>
@@ -511,6 +598,14 @@ function Profile() {
                     </div>
                 </div>
             </div>
+
+            {/* Disconnect Confirmation Modal */}
+            <DisconnectConfirmationModal
+                isOpen={disconnectModal.isOpen}
+                onConfirm={confirmDisconnect}
+                onCancel={closeDisconnectModal}
+                isDisconnecting={disconnectModal.isDisconnecting}
+            />
         </>
     );
 }

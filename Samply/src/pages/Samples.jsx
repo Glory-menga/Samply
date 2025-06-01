@@ -1,26 +1,131 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import Peaks from 'peaks.js';
 import Nav from '../components/Nav';
 import SavedSamplesTab from '../components/tabs/SavedSamplesTab';
 import AnimatedBackground from '../components/background/AnimatedBackground';
-import { Save, ArrowDownToLine, Play, Pause, Share2, Lock, LogIn, X } from 'lucide-react';
+import { Save, ArrowDownToLine, Play, Pause, Share2, Lock, LogIn, X, Trash2 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
-import audioFile from '../assets/audio/Generate_Voice.mp3'; 
+import { toast } from 'react-toastify';
 import '../css/Samples.css';
+
+const DeleteConfirmationModal = ({ isOpen, sampleName, onConfirm, onCancel, isDeleting }) => {
+    if (!isOpen) return null;
+
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <motion.div 
+                    className="delete-modal-overlay"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    <motion.div 
+                        className="delete-modal-content"
+                        initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                        transition={{ duration: 0.3, type: "spring", damping: 20 }}
+                    >
+                        <div className="delete-modal-header">
+                            <h2>Delete Sample</h2>
+                        </div>
+                        <div className="delete-modal-body">
+                            <p>Are you sure you want to delete the sample</p>
+                            <p className="sample-name-highlight">"{sampleName}"?</p>
+                            <p>This action cannot be undone.</p>
+                        </div>
+                        <div className="delete-modal-actions">
+                            <button 
+                                className="btn-cancel"
+                                onClick={onCancel}
+                                disabled={isDeleting}
+                            >
+                                No, Keep It
+                            </button>
+                            <button 
+                                className="btn-delete"
+                                onClick={onConfirm}
+                                disabled={isDeleting}
+                            >
+                                {isDeleting ? (
+                                    <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                                        <div className="delete-spinner"></div>
+                                        Deleting...
+                                    </div>
+                                ) : (
+                                    'Yes, Delete'
+                                )}
+                            </button>
+                        </div>
+                    </motion.div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    );
+};
 
 function Samples(){
     const navigate = useNavigate();
-    const audioRef = useRef(null);
-    const waveformRef = useRef(null);
-    const peaksInstance = useRef(null);
+    const audioRefs = useRef({});
+    const waveformRefs = useRef({});
+    const peaksInstances = useRef({});
     
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [duration, setDuration] = useState('00:00');
-    const [currentTime, setCurrentTime] = useState('00:00');
-    const [isLoaded, setIsLoaded] = useState(false);
+    const [playingIndex, setPlayingIndex] = useState(null);
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [samples, setSamples] = useState([]);
+    const [loadingSamples, setLoadingSamples] = useState(false);
+    const [audioStates, setAudioStates] = useState({});
+    const [deleteModal, setDeleteModal] = useState({
+        isOpen: false,
+        sampleId: null,
+        sampleName: '',
+        sampleIndex: null,
+        isDeleting: false
+    });
+
+    const titleVariants = {
+        hidden: { opacity: 0, y: -30 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: { 
+                duration: 0.8,
+                ease: "easeOut"
+            }
+        }
+    };
+
+    const samplesContainerVariants = {
+        hidden: { opacity: 0, y: 50 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: { 
+                duration: 0.8,
+                ease: "easeOut",
+                delay: 0.3
+            }
+        }
+    };
+
+    const sampleItemVariants = {
+        hidden: { opacity: 0, y: 30 },
+        visible: (index) => ({
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: 0.6,
+                ease: "easeOut",
+                delay: index * 0.1
+            }
+        })
+    };
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -45,140 +150,42 @@ function Samples(){
     }, []);
 
     useEffect(() => {
+        if (user) {
+            fetchUserSamples();
+        }
+    }, [user]);
+
+    const fetchUserSamples = async () => {
         if (!user) return;
 
-        const audio = audioRef.current;
-        
-        if (!audio || !waveformRef.current) return;
+        setLoadingSamples(true);
+        try {
+            const response = await fetch(`http://localhost:5000/api/community/user-samples/${user.id}`);
+            const data = await response.json();
 
-        const initPeaks = () => {
-            const options = {
-                overview: {
-                    container: waveformRef.current,
-                    waveformColor: '#ffffff',
-                    progressColor: '#000000', 
-                    cursorColor: '#ffffff',
-                    cursorWidth: 2,
-                    showPlayheadTime: false,
-                    timeLabelPrecision: 0,
-                    enablePoints: false,
-                    enableSegments: false,
-                    enableMarkers: false,
-                    showAxisLabels: false, 
-                    axisTopMarkerHeight: 0, 
-                    axisBottomMarkerHeight: 0,
-                    axisLabelColor: 'transparent', 
-                },
-                mediaElement: audio,
-                webAudio: {
-                    audioContext: new (window.AudioContext || window.webkitAudioContext)(),
-                },
-                keyboard: false,
-                mouseWheelMode: 'none',
-                segmentOptions: {
-                    markers: false,
-                },
-                zoomLevels: [1024],
-                height: 40,
-            };
-
-            Peaks.init(options, (err, peaks) => {
-                if (err) {
-                    console.error('Peaks.js initialization error:', err);
-                    return;
-                }
-                
-                peaksInstance.current = peaks;
-                setIsLoaded(true);
-                
-                const view = peaks.views.getView('overview');
-                if (view) {
-                    if (typeof view.enableAutoScroll === 'function') {
-                        view.enableAutoScroll(false);
-                    }
-                    if (typeof view.enableMarkerEditing === 'function') {
-                        view.enableMarkerEditing(false);
-                    }
-                }
-                
-                const player = peaks.player;
-                const audioElement = audioRef.current;
-                
-                if (player && typeof player.on === 'function') {
-                    player.on('play', () => {
-                        setIsPlaying(true);
-                    });
-                    
-                    player.on('pause', () => {
-                        setIsPlaying(false);
-                    });
-                    
-                    player.on('ended', () => {
-                        setIsPlaying(false);
-                        setCurrentTime('00:00');
-                    });
-                    
-                    player.on('timeupdate', (time) => {
-                        setCurrentTime(formatTime(time));
-                    });
-                    
-                    player.on('canplay', () => {
-                        const dur = player.getDuration();
-                        setDuration(formatTime(dur));
-                    });
-                } else {
-                    audioElement.addEventListener('play', () => {
-                        setIsPlaying(true);
-                    });
-                    
-                    audioElement.addEventListener('pause', () => {
-                        setIsPlaying(false);
-                    });
-                    
-                    audioElement.addEventListener('ended', () => {
-                        setIsPlaying(false);
-                        setCurrentTime('00:00');
-                    });
-                    
-                    audioElement.addEventListener('timeupdate', () => {
-                        setCurrentTime(formatTime(audioElement.currentTime));
-                    });
-                    
-                    audioElement.addEventListener('canplay', () => {
-                        setDuration(formatTime(audioElement.duration));
-                    });
-                }
-
-                setTimeout(() => {
-                    const waveformContainer = waveformRef.current;
-                    if (waveformContainer) {
-                        const textElements = waveformContainer.querySelectorAll('text, .time-label, .axis-label');
-                        textElements.forEach(el => {
-                            el.style.display = 'none';
-                        });
-                        
-                        const svgTexts = waveformContainer.querySelectorAll('svg text');
-                        svgTexts.forEach(el => {
-                            el.style.display = 'none';
-                        });
-                    }
-                }, 100);
-            });
-        };
-
-        if (audio.readyState >= 2) {
-            initPeaks();
-        } else {
-            audio.addEventListener('loadedmetadata', initPeaks, { once: true });
-        }
-
-        return () => {
-            if (peaksInstance.current) {
-                peaksInstance.current.destroy();
-                peaksInstance.current = null;
+            if (response.ok) {
+                setSamples(data.samples || []);
+                const initialStates = {};
+                data.samples?.forEach((_, index) => {
+                    initialStates[index] = {
+                        isPlaying: false,
+                        duration: '00:00',
+                        currentTime: '00:00',
+                        isLoaded: false
+                    };
+                });
+                setAudioStates(initialStates);
+            } else {
+                console.error('Failed to fetch samples:', data.error);
+                toast.error('Failed to load your samples');
             }
-        };
-    }, [user]);
+        } catch (error) {
+            console.error('Error fetching samples:', error);
+            toast.error('Failed to load your samples');
+        } finally {
+            setLoadingSamples(false);
+        }
+    };
 
     const formatTime = (seconds) => {
         if (isNaN(seconds)) return '00:00';
@@ -187,44 +194,237 @@ function Samples(){
         return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
     };
 
-    const togglePlayPause = () => {
-        if (!user || !peaksInstance.current || !isLoaded) return;
+    const initializePeaks = (sample, index) => {
+        const audioRef = audioRefs.current[index];
+        const waveformRef = waveformRefs.current[index];
         
-        const player = peaksInstance.current.player;
-        const audioElement = audioRef.current;
+        if (!audioRef || !waveformRef || peaksInstances.current[index]) return;
+
+        const options = {
+            overview: {
+                container: waveformRef,
+                waveformColor: '#ffffff',
+                progressColor: '#000000', 
+                cursorColor: '#ffffff',
+                cursorWidth: 2,
+                showPlayheadTime: false,
+                timeLabelPrecision: 0,
+                enablePoints: false,
+                enableSegments: false,
+                enableMarkers: false,
+                showAxisLabels: false, 
+                axisTopMarkerHeight: 0, 
+                axisBottomMarkerHeight: 0,
+                axisLabelColor: 'transparent', 
+            },
+            mediaElement: audioRef,
+            webAudio: {
+                audioContext: new (window.AudioContext || window.webkitAudioContext)(),
+            },
+            keyboard: false,
+            mouseWheelMode: 'none',
+            segmentOptions: {
+                markers: false,
+            },
+            zoomLevels: [1024],
+            height: 40,
+        };
+
+        Peaks.init(options, (err, peaks) => {
+            if (err) {
+                console.error('Peaks.js initialization error:', err);
+                return;
+            }
+            
+            peaksInstances.current[index] = peaks;
+            
+            setAudioStates(prev => ({
+                ...prev,
+                [index]: { ...prev[index], isLoaded: true }
+            }));
+            
+            const view = peaks.views.getView('overview');
+            if (view) {
+                if (typeof view.enableAutoScroll === 'function') {
+                    view.enableAutoScroll(false);
+                }
+                if (typeof view.enableMarkerEditing === 'function') {
+                    view.enableMarkerEditing(false);
+                }
+            }
+            
+            const player = peaks.player;
+            
+            if (player && typeof player.on === 'function') {
+                player.on('play', () => {
+                    setAudioStates(prev => ({
+                        ...prev,
+                        [index]: { ...prev[index], isPlaying: true }
+                    }));
+                    setPlayingIndex(index);
+                });
+                
+                player.on('pause', () => {
+                    setAudioStates(prev => ({
+                        ...prev,
+                        [index]: { ...prev[index], isPlaying: false }
+                    }));
+                    if (playingIndex === index) setPlayingIndex(null);
+                });
+                
+                player.on('ended', () => {
+                    setAudioStates(prev => ({
+                        ...prev,
+                        [index]: { ...prev[index], isPlaying: false, currentTime: '00:00' }
+                    }));
+                    if (playingIndex === index) setPlayingIndex(null);
+                });
+                
+                player.on('timeupdate', (time) => {
+                    setAudioStates(prev => ({
+                        ...prev,
+                        [index]: { ...prev[index], currentTime: formatTime(time) }
+                    }));
+                });
+                
+                player.on('canplay', () => {
+                    const dur = player.getDuration();
+                    setAudioStates(prev => ({
+                        ...prev,
+                        [index]: { ...prev[index], duration: formatTime(dur) }
+                    }));
+                });
+            } else {
+                audioRef.addEventListener('play', () => {
+                    setAudioStates(prev => ({
+                        ...prev,
+                        [index]: { ...prev[index], isPlaying: true }
+                    }));
+                    setPlayingIndex(index);
+                });
+                
+                audioRef.addEventListener('pause', () => {
+                    setAudioStates(prev => ({
+                        ...prev,
+                        [index]: { ...prev[index], isPlaying: false }
+                    }));
+                    if (playingIndex === index) setPlayingIndex(null);
+                });
+                
+                audioRef.addEventListener('ended', () => {
+                    setAudioStates(prev => ({
+                        ...prev,
+                        [index]: { ...prev[index], isPlaying: false, currentTime: '00:00' }
+                    }));
+                    if (playingIndex === index) setPlayingIndex(null);
+                });
+                
+                audioRef.addEventListener('timeupdate', () => {
+                    setAudioStates(prev => ({
+                        ...prev,
+                        [index]: { ...prev[index], currentTime: formatTime(audioRef.currentTime) }
+                    }));
+                });
+                
+                audioRef.addEventListener('canplay', () => {
+                    setAudioStates(prev => ({
+                        ...prev,
+                        [index]: { ...prev[index], duration: formatTime(audioRef.duration) }
+                    }));
+                });
+            }
+
+            setTimeout(() => {
+                const textElements = waveformRef.querySelectorAll('text, .time-label, .axis-label');
+                textElements.forEach(el => {
+                    el.style.display = 'none';
+                });
+                
+                const svgTexts = waveformRef.querySelectorAll('svg text');
+                svgTexts.forEach(el => {
+                    el.style.display = 'none';
+                });
+            }, 100);
+        });
+    };
+
+    useEffect(() => {
+        if (samples.length > 0) {
+            samples.forEach((sample, index) => {
+                const audioRef = audioRefs.current[index];
+                if (audioRef && audioRef.readyState >= 2) {
+                    initializePeaks(sample, index);
+                } else if (audioRef) {
+                    audioRef.addEventListener('loadedmetadata', () => initializePeaks(sample, index), { once: true });
+                }
+            });
+        }
+
+        return () => {
+            Object.values(peaksInstances.current).forEach(peaks => {
+                if (peaks && typeof peaks.destroy === 'function') {
+                    peaks.destroy();
+                }
+            });
+            peaksInstances.current = {};
+        };
+    }, [samples]);
+
+    const togglePlayPause = (index) => {
+        const peaksInstance = peaksInstances.current[index];
+        const audioRef = audioRefs.current[index];
+        const audioState = audioStates[index];
         
-        if (isPlaying) {
+        if (!peaksInstance || !audioState?.isLoaded) return;
+
+        if (playingIndex !== null && playingIndex !== index) {
+            const otherPeaks = peaksInstances.current[playingIndex];
+            const otherAudio = audioRefs.current[playingIndex];
+            
+            if (otherPeaks?.player?.pause) {
+                otherPeaks.player.pause();
+            } else if (otherAudio) {
+                otherAudio.pause();
+            }
+        }
+        
+        const player = peaksInstance.player;
+        
+        if (audioState.isPlaying) {
             if (player && typeof player.pause === 'function') {
                 player.pause();
             } else {
-                audioElement.pause();
+                audioRef.pause();
             }
         } else {
             if (player && typeof player.play === 'function') {
                 player.play();
             } else {
-                audioElement.play();
+                audioRef.play();
             }
         }
     };
 
-    const handleWaveformClick = (event) => {
-        if (!user || !peaksInstance.current || !isLoaded) return;
+    const handleWaveformClick = (event, index) => {
+        const peaksInstance = peaksInstances.current[index];
+        const waveformRef = waveformRefs.current[index];
+        const audioRef = audioRefs.current[index];
+        const audioState = audioStates[index];
         
-        const waveformContainer = waveformRef.current;
-        const rect = waveformContainer.getBoundingClientRect();
+        if (!peaksInstance || !audioState?.isLoaded) return;
+        
+        const rect = waveformRef.getBoundingClientRect();
         const clickX = event.clientX - rect.left;
         const containerWidth = rect.width;
         const clickRatio = clickX / containerWidth;
         
-        const player = peaksInstance.current.player;
-        const audioElement = audioRef.current;
+        const player = peaksInstance.player;
         
         let duration;
         if (player && typeof player.getDuration === 'function') {
             duration = player.getDuration();
         } else {
-            duration = audioElement.duration;
+            duration = audioRef.duration;
         }
         
         const seekTime = duration * clickRatio;
@@ -232,78 +432,111 @@ function Samples(){
         if (player && typeof player.seek === 'function') {
             player.seek(seekTime);
         } else {
-            audioElement.currentTime = seekTime;
+            audioRef.currentTime = seekTime;
         }
     };
 
-    const handleTimestampClick = () => {
-        if (!user || !peaksInstance.current || !isLoaded) return;
-        
-        const timeInput = prompt("Enter time to seek to (format: mm:ss or seconds):");
-        if (!timeInput) return;
-        
-        let seekTime = 0;
-        
-        if (timeInput.includes(':')) {
-            const [minutes, seconds] = timeInput.split(':').map(Number);
-            if (!isNaN(minutes) && !isNaN(seconds)) {
-                seekTime = minutes * 60 + seconds;
-            }
-        } else {
-            seekTime = parseFloat(timeInput);
-        }
-        
-        if (!isNaN(seekTime) && seekTime >= 0) {
-            const player = peaksInstance.current.player;
-            const audioElement = audioRef.current;
+    const handleDownload = async (sample, index) => {
+        try {
+            const response = await fetch(sample.sample_url);
+            const blob = await response.blob();
             
-            let duration;
-            if (player && typeof player.getDuration === 'function') {
-                duration = player.getDuration();
-            } else {
-                duration = audioElement.duration;
-            }
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${sample.title}.mp3`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
             
-            seekTime = Math.min(seekTime, duration);
-            
-            if (player && typeof player.seek === 'function') {
-                player.seek(seekTime);
-            } else {
-                audioElement.currentTime = seekTime;
-            }
-        } else {
-            alert('Invalid time format. Use mm:ss or seconds.');
+            toast.success('Download started!');
+        } catch (error) {
+            console.error('Error downloading audio:', error);
+            toast.error('Failed to download audio');
         }
     };
 
-    const pauseAudio = () => {
-        if (!user || !peaksInstance.current || !isLoaded) return;
+    const openDeleteModal = (sampleId, sampleName, index) => {
+        setDeleteModal({
+            isOpen: true,
+            sampleId,
+            sampleName,
+            sampleIndex: index,
+            isDeleting: false
+        });
+    };
+
+    const closeDeleteModal = () => {
+        if (deleteModal.isDeleting) return;
+        setDeleteModal({
+            isOpen: false,
+            sampleId: null,
+            sampleName: '',
+            sampleIndex: null,
+            isDeleting: false
+        });
+    };
+
+    const confirmDelete = async () => {
+        const { sampleId, sampleName, sampleIndex } = deleteModal;
         
-        const player = peaksInstance.current.player;
-        const audioElement = audioRef.current;
+        setDeleteModal(prev => ({ ...prev, isDeleting: true }));
         
-        if (isPlaying) {
-            if (player && typeof player.pause === 'function') {
-                player.pause();
+        try {
+            const response = await fetch(`http://localhost:5000/api/community/samples/${sampleId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user_id: user.id })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                toast.success(`${sampleName} deleted successfully!`);
+                
+                setSamples(prev => prev.filter((_, i) => i !== sampleIndex));
+                
+                if (peaksInstances.current[sampleIndex]) {
+                    peaksInstances.current[sampleIndex].destroy();
+                    delete peaksInstances.current[sampleIndex];
+                }
+                
+                setAudioStates(prev => {
+                    const newStates = { ...prev };
+                    delete newStates[sampleIndex];
+                    return newStates;
+                });
+                
+                if (playingIndex === sampleIndex) {
+                    setPlayingIndex(null);
+                }
+                
+                closeDeleteModal();
             } else {
-                audioElement.pause();
+                console.error('Delete error:', result);
+                toast.error(result.error || 'Failed to delete sample');
+                setDeleteModal(prev => ({ ...prev, isDeleting: false }));
             }
+        } catch (error) {
+            console.error('Error deleting sample:', error);
+            toast.error('Failed to delete sample');
+            setDeleteModal(prev => ({ ...prev, isDeleting: false }));
         }
     };
 
-    const playAudio = () => {
-        if (!user || !peaksInstance.current || !isLoaded) return;
-        
-        const player = peaksInstance.current.player;
-        const audioElement = audioRef.current;
-        
-        if (!isPlaying) {
-            if (player && typeof player.play === 'function') {
-                player.play();
-            } else {
-                audioElement.play();
-            }
-        }
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true,
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
     };
 
     const handleLogin = () => {
@@ -350,80 +583,7 @@ function Samples(){
                         </div>
                     </div>
                     <SavedSamplesTab/>
-                    <h1>Posted Samples</h1>
-                    <div className='samples'>
-                        <div className='sample'>
-                            <div className='sample-audio'>
-                                <div className='sample-intro'>
-                                    <div className='sample-txt'>
-                                        <p>Jazzy sample type beat</p>
-                                    </div>
-                                    <div className='sample-icons'>
-                                        <button disabled>
-                                            <Save size={32} strokeWidth={1} color='#666'/>
-                                        </button>
-                                        <button disabled>
-                                            <ArrowDownToLine size={32} strokeWidth={1} color='#666'/>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className='audio-wave'>
-                                    <div className='audio'>  
-                                        <button 
-                                            disabled
-                                            style={{ 
-                                                background: 'none', 
-                                                border: 'none', 
-                                                cursor: 'not-allowed',
-                                                padding: 0,
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                opacity: 0.5
-                                            }}
-                                            className='play-pause'
-                                        >
-                                            <Play size={40} strokeWidth={1} color='#666' fill='#666'/>
-                                        </button>
-                                        <div className='wave-time'>
-                                            <div 
-                                                className='wave' 
-                                                ref={waveformRef}
-                                                style={{ opacity: 0.5, cursor: 'not-allowed' }}
-                                            ></div>
-                                            <div 
-                                                style={{ 
-                                                    cursor: 'not-allowed',
-                                                    userSelect: 'none',
-                                                    opacity: 0.5
-                                                }}
-                                                className='time'
-                                            >
-                                                <p>00:00</p>
-                                                <p> 00:00</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className='share'>
-                                        <button disabled>
-                                            <Share2 size={30} strokeWidth={1} color='#666'/>
-                                            <p>Share</p>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='sample-date'>
-                                <p>6:50 PM - 05th january 2025</p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-                {/* Audio element for Peaks.js */}
-                <audio 
-                    ref={audioRef} 
-                    src={audioFile} 
-                    preload="metadata"
-                    style={{ display: 'none' }}
-                />
             </>
         );
     }
@@ -434,93 +594,134 @@ function Samples(){
             <AnimatedBackground/>
             <div className='sample-container'>
                 <SavedSamplesTab/>
-                <h1>Posted Samples</h1>
-                <div className='samples'>
-                    <div className='sample'>
-                        <div className='sample-audio'>
-                            <div className='sample-intro'>
-                                <div className='sample-txt'>
-                                    <p>Jazzy sample type beat</p>
-                                </div>
-                                <div className='sample-icons'>
-                                    <button>
-                                        <Save size={32} strokeWidth={1} color='#fff'/>
-                                    </button>
-                                    <button>
-                                        <ArrowDownToLine size={32} strokeWidth={1} color='#fff'/>
-                                    </button>
-                                </div>
-                            </div>
-                            <div className='audio-wave'>
-                                <div className='audio'>  
-                                    <button 
-                                        onClick={togglePlayPause}
-                                        disabled={!isLoaded}
-                                        style={{ 
-                                            background: 'none', 
-                                            border: 'none', 
-                                            cursor: isLoaded ? 'pointer' : 'not-allowed',
-                                            padding: 0,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            opacity: isLoaded ? 1 : 0.5
-                                        }}
-                                        className='play-pause'
-                                    >
-                                        {isPlaying ? 
-                                            <Pause size={40} strokeWidth={1} color='#fff' fill='#fff'/> :
-                                            <Play size={40} strokeWidth={1} color='#fff' fill='#fff'/>
-                                        }
-                                    </button>
-                                    <div className='wave-time'>
-                                        <div 
-                                            className='wave' 
-                                            ref={waveformRef}
-                                            onClick={handleWaveformClick}
-                                            style={{ cursor: 'pointer' }}
-                                        ></div>
-                                        <div 
-                                            style={{ 
-                                                cursor: 'pointer',
-                                                userSelect: 'none'
-                                            }}
-                                            onClick={handleTimestampClick}
-                                            title="Click to seek"
-                                            className='time'
-                                        >
-                                            <p>{currentTime}</p>
-                                            <p> {duration}</p>
+                
+                <motion.h1
+                    variants={titleVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    Posted Samples
+                </motion.h1>
+                
+                {loadingSamples ? (
+                    <div className="loading-samples">
+                        <p>Loading your samples...</p>
+                    </div>
+                ) : samples.length === 0 ? (
+                    <motion.div 
+                        className="no-samples-message"
+                        variants={samplesContainerVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
+                        <p>No samples posted yet.</p>
+                        <p>Start by <Link to={'/generate'}> Generating a sample</Link> and publishing them!</p>
+                    </motion.div>
+                ) : (
+                    <motion.div 
+                        className='samples'
+                        variants={samplesContainerVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
+                        {samples.map((sample, index) => (
+                            <motion.div 
+                                key={sample.id} 
+                                className='sample'
+                                variants={sampleItemVariants}
+                                initial="hidden"
+                                animate="visible"
+                                custom={index}
+                            >
+                                <div className='sample-audio'>
+                                    <div className='sample-intro'>
+                                        <div className='sample-txt'>
+                                            <p>{sample.title}</p>
+                                        </div>
+                                        <div className='sample-icons'>
+                                            <button 
+                                                onClick={() => handleDownload(sample, index)}
+                                                title="Download"
+                                            >
+                                                <ArrowDownToLine size={32} strokeWidth={1} color='#fff'/>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className='audio-wave'>
+                                        <div className='audio'>  
+                                            <button 
+                                                onClick={() => togglePlayPause(index)}
+                                                disabled={!audioStates[index]?.isLoaded}
+                                                style={{ 
+                                                    background: 'none', 
+                                                    border: 'none', 
+                                                    cursor: audioStates[index]?.isLoaded ? 'pointer' : 'not-allowed',
+                                                    padding: 0,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    opacity: audioStates[index]?.isLoaded ? 1 : 0.5
+                                                }}
+                                                className='play-pause'
+                                            >
+                                                {audioStates[index]?.isPlaying ? 
+                                                    <Pause size={40} strokeWidth={1} color='#fff' fill='#fff'/> :
+                                                    <Play size={40} strokeWidth={1} color='#fff' fill='#fff'/>
+                                                }
+                                            </button>
+                                            <div className='wave-time'>
+                                                <div 
+                                                    className='wave' 
+                                                    ref={el => waveformRefs.current[index] = el}
+                                                    onClick={(e) => handleWaveformClick(e, index)}
+                                                    style={{ cursor: 'pointer' }}
+                                                ></div>
+                                                <div className='time'>
+                                                    <p>{audioStates[index]?.currentTime || '00:00'}</p>
+                                                    <p>{audioStates[index]?.duration || '00:00'}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className='share'>
+                                            <button>
+                                                <Share2 size={30} strokeWidth={1} color='#fff'/>
+                                                <p>Share</p>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
-                                <div className='share'>
-                                    <button>
-                                        <Share2 size={30} strokeWidth={1} color='#fff'/>
-                                        <p>Share</p>
-                                    </button>
+                                <div className='sample-date'>
+                                    <div className='sample-save'>
+                                        <button 
+                                            onClick={() => openDeleteModal(sample.id, sample.title, index)}
+                                            title="Delete sample"
+                                        >
+                                            <Trash2 size={32} strokeWidth={1} color='#fff'/>
+                                        </button>
+                                    </div>
+                                    <p>{formatDate(sample.created_at)}</p>
                                 </div>
-                            </div>
-                        </div>
-                        <div className='sample-date'>
-                            <div className='sample-save'>
-                                <button>
-                                    <X size={40} strokeWidth={1} color='#fff'/>
-                                </button>
-                            </div>
-                            <p>6:50 PM - 05th january 2025</p>
-                        </div>
-                    </div>
-                    
-                </div>
-                
-                {/* Audio element for Peaks.js */}
-                <audio 
-                    ref={audioRef} 
-                    src={audioFile} 
-                    preload="metadata"
-                    style={{ display: 'none' }}
-                />
+                                
+                                {/* Audio element for each sample */}
+                                <audio 
+                                    ref={el => audioRefs.current[index] = el}
+                                    src={sample.sample_url} 
+                                    preload="metadata"
+                                    style={{ display: 'none' }}
+                                />
+                            </motion.div>
+                        ))}
+                    </motion.div>
+                )}
             </div>
+
+            {/* Delete Confirmation Modal */}
+            <DeleteConfirmationModal
+                isOpen={deleteModal.isOpen}
+                sampleName={deleteModal.sampleName}
+                onConfirm={confirmDelete}
+                onCancel={closeDeleteModal}
+                isDeleting={deleteModal.isDeleting}
+            />
         </>
     );
 }
