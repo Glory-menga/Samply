@@ -362,7 +362,7 @@ function Samples(){
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
             
-            toast.success('Download started!');
+            toast.success('Downloaded!');
         } catch (error) {
             console.error('Error downloading audio:', error);
             toast.error('Failed to download audio');

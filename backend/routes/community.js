@@ -287,6 +287,34 @@ router.delete('/samples/:id', async (req, res) => {
   }
 });
 
+router.get('/user-saved-samples/:user_id', async (req, res) => {
+  try {
+    const { user_id } = req.params;
+
+    const { data: samples, error } = await supabase
+      .from('samples')
+      .select('*')
+      .eq('user_id', user_id)
+      .eq('saved', true)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      return res.status(500).json({ 
+        error: 'Failed to fetch saved samples',
+        details: error.message 
+      });
+    }
+
+    res.json({ samples });
+  } catch (error) {
+    console.error('Fetch saved samples error:', error);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
+    });
+  }
+});
+
 router.put('/samples/:id/save', async (req, res) => {
   try {
     const { id } = req.params;
