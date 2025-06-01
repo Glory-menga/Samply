@@ -26,10 +26,6 @@ function CommentSample(){
                                         <ArrowDownToLine size={28} strokeWidth={1} color='#fff'/>
                                         <p>Download</p>
                                     </div>
-                                    <div className='info-post-icon'>
-                                        <Share2 size={28} strokeWidth={1} color='#fff'/>
-                                        <p>Share</p>
-                                    </div>
                                 </div>
                             </div>
                             <div className='audio-post-comment'>
@@ -48,7 +44,7 @@ function CommentSample(){
                                     </div>
                                 </div>
                                 <div className='like-post-comment'>
-                                    <Heart size={28} strokeWidth={1} color='#fff'/>
+                                    <Share2 size={28} strokeWidth={1} color='#fff'/>
                                     <p>Share</p>
                                 </div>
                             </div>

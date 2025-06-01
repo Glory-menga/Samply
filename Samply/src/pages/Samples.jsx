@@ -4,7 +4,7 @@ import Peaks from 'peaks.js';
 import Nav from '../components/Nav';
 import SavedSamplesTab from '../components/tabs/SavedSamplesTab';
 import AnimatedBackground from '../components/background/AnimatedBackground';
-import { Save, ArrowDownToLine, Play, Pause, Share2, Lock, LogIn } from 'lucide-react';
+import { Save, ArrowDownToLine, Play, Pause, Share2, Lock, LogIn, X } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import audioFile from '../assets/audio/Generate_Voice.mp3'; 
 import '../css/Samples.css';
@@ -502,10 +502,14 @@ function Samples(){
                             </div>
                         </div>
                         <div className='sample-date'>
+                            <div className='sample-save'>
+                                <button>
+                                    <X size={40} strokeWidth={1} color='#fff'/>
+                                </button>
+                            </div>
                             <p>6:50 PM - 05th january 2025</p>
                         </div>
                     </div>
-                    
                     
                 </div>
                 

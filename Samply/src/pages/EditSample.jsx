@@ -496,7 +496,7 @@ function EditSample(){
                                 <Metaball 
                                     width="100%" 
                                     height="100%" 
-                                    sphereScale={1.4}
+                                    sphereScale={1.3}
                                     analyser={webAudioAnalyserRef.current}
                                     animationSpeed={isPlaying ? 1.5 : 0.3}
                                     isHovering={isPlaying}

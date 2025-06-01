@@ -31,11 +31,27 @@
 }
 .sample-date{
   display: flex;
-  flex-direction: row;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
   border-left: 1px solid #fff;
   width: 30%;
+}
+.sample-save{
+  display: flex;
+  justify-content: flex-end;
+  height: 42%;
+  width: 85%;
+}
+.sample-save button{
+  display: flex;
+  align-items: flex-start;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.sample-save button:hover{
+  transform: scale(1.2);
 }
 .sample-date p{
   font-size: 22px;

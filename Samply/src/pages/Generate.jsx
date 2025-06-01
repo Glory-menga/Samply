@@ -402,7 +402,7 @@ function Generate(){
                                         <p>4.</p>
                                     </div>
                                     <div className='tip-txt'>
-                                        <p><b>Download & Use</b> – Save your sample for music production, content, or inspiration.</p>
+                                        <p><b>Download & Use</b> – Download your sample for music production, content, or inspiration.</p>
                                     </div>
                                 </motion.div>
                             </motion.div>
