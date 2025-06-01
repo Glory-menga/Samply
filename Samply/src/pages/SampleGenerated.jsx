@@ -383,9 +383,6 @@ function SampleGenerated(){
                                                 <button onClick={() => handleDownload(index)}>
                                                     <ArrowDownToLine size={28} strokeWidth={1} color='#fff'/>
                                                 </button>
-                                                <button onClick={() => handleSave(index)}>
-                                                    <Save size={28} strokeWidth={1} color='#fff'/>
-                                                </button>
                                             </div>
                                         </div>
                                         <div className='wave-generated-sample'>

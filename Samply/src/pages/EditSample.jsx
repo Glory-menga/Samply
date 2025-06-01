@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Galaxy from '../components/3dObjects/Galaxy';
-import { LoaderCircle, Play, Square } from 'lucide-react';
+import { Play, Square } from 'lucide-react';
 import Metaball from '../components/3dObjects/Metaball';
 import Knob from '../components/Knob';
 import * as Checkbox from '@radix-ui/react-checkbox';
@@ -451,7 +451,10 @@ function EditSample(){
                 </div>
                 <div className="edit-sample-container">
                     <div className="back">
-                        <button onClick={() => navigate(-1)}> 
+                        <button onClick={() => {
+                            localStorage.removeItem('editSampleData');
+                            navigate(-1);
+                        }}> 
                             <p>Back to the generated samples</p>
                         </button>
                     </div>
@@ -576,7 +579,7 @@ function EditSample(){
                             ease: "easeOut" 
                         }}
                     >
-                        <LoaderCircle size={48} strokeWidth={1} color='#fff' className="download-spinner-large"/>
+                        <Loader size={48} strokeWidth={1} color='#fff' className="download-spinner-large"/>
                         <p>Recording and downloading edited sample...</p>
                     </motion.div>
                 </div>

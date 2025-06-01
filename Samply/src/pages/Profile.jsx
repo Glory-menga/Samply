@@ -422,6 +422,7 @@ function Profile() {
                                                 placeholder="New Password"
                                                 value={passwordForm.newPassword}
                                                 onChange={(e) => handlePasswordFormChange('newPassword', e.target.value)}
+                                                autoComplete="new-password"
                                             />
                                             <span onClick={() => setShowNewPassword(!showNewPassword)}>
                                                 {showNewPassword ? <EyeOff strokeWidth={1} size={36} color='#fff' /> : <Eye strokeWidth={1} size={36} color='#fff' />}
@@ -442,6 +443,7 @@ function Profile() {
                                                 placeholder="Confirm New Password"
                                                 value={passwordForm.confirmPassword}
                                                 onChange={(e) => handlePasswordFormChange('confirmPassword', e.target.value)}
+                                                autoComplete="confirm-new-password"
                                             />
                                             <span onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                                                 {showConfirmPassword ? <EyeOff strokeWidth={1} size={36} color='#fff' /> : <Eye strokeWidth={1} size={36} color='#fff' />}

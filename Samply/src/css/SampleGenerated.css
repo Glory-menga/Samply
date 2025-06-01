@@ -60,6 +60,7 @@
   gap: 8px;
 }
 .generated-sample-icons button{
+  cursor: pointer;
   border: none;
   background: none;
   transition: 0.3s;
