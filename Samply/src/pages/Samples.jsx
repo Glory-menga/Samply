@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import Peaks from 'peaks.js';
+import WaveSurfer from 'wavesurfer.js';
 import Nav from '../components/Nav';
 import SavedSamplesTab from '../components/tabs/SavedSamplesTab';
 import AnimatedBackground from '../components/background/AnimatedBackground';
@@ -71,9 +71,8 @@ const DeleteConfirmationModal = ({ isOpen, sampleName, onConfirm, onCancel, isDe
 
 function Samples(){
     const navigate = useNavigate();
-    const audioRefs = useRef({});
     const waveformRefs = useRef({});
-    const peaksInstances = useRef({});
+    const waveSurferInstances = useRef({});
     
     const [playingIndex, setPlayingIndex] = useState(null);
     const [user, setUser] = useState(null);
@@ -194,245 +193,157 @@ function Samples(){
         return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
     };
 
-    const initializePeaks = (sample, index) => {
-        const audioRef = audioRefs.current[index];
+    const initializeWaveSurfer = (sample, index) => {
         const waveformRef = waveformRefs.current[index];
         
-        if (!audioRef || !waveformRef || peaksInstances.current[index]) return;
+        if (!waveformRef || waveSurferInstances.current[index]) return;
 
-        const options = {
-            overview: {
+        try {
+            const wavesurfer = WaveSurfer.create({
                 container: waveformRef,
-                waveformColor: '#ffffff',
-                progressColor: '#000000', 
-                cursorColor: '#ffffff',
-                cursorWidth: 2,
-                showPlayheadTime: false,
-                timeLabelPrecision: 0,
-                enablePoints: false,
-                enableSegments: false,
-                enableMarkers: false,
-                showAxisLabels: false, 
-                axisTopMarkerHeight: 0, 
-                axisBottomMarkerHeight: 0,
-                axisLabelColor: 'transparent', 
-            },
-            mediaElement: audioRef,
-            webAudio: {
-                audioContext: new (window.AudioContext || window.webkitAudioContext)(),
-            },
-            keyboard: false,
-            mouseWheelMode: 'none',
-            segmentOptions: {
-                markers: false,
-            },
-            zoomLevels: [1024],
-            height: 40,
-        };
+                waveColor: '#ffffff',
+                progressColor: '#212121',
+                cursorColor: '#000000',
+                cursorWidth: 1,
+                barWidth: 1,
+                barGap: 1,
+                height: 60,
+                normalize: true,
+                backend: 'WebAudio',
+                mediaControls: false,
+                interact: true,
+                hideScrollbar: true,
+                fillParent: true,
+                responsive: true
+            });
 
-        Peaks.init(options, (err, peaks) => {
-            if (err) {
-                console.error('Peaks.js initialization error:', err);
-                return;
-            }
-            
-            peaksInstances.current[index] = peaks;
-            
-            setAudioStates(prev => ({
-                ...prev,
-                [index]: { ...prev[index], isLoaded: true }
-            }));
-            
-            const view = peaks.views.getView('overview');
-            if (view) {
-                if (typeof view.enableAutoScroll === 'function') {
-                    view.enableAutoScroll(false);
-                }
-                if (typeof view.enableMarkerEditing === 'function') {
-                    view.enableMarkerEditing(false);
-                }
-            }
-            
-            const player = peaks.player;
-            
-            if (player && typeof player.on === 'function') {
-                player.on('play', () => {
-                    setAudioStates(prev => ({
-                        ...prev,
-                        [index]: { ...prev[index], isPlaying: true }
-                    }));
-                    setPlayingIndex(index);
-                });
-                
-                player.on('pause', () => {
-                    setAudioStates(prev => ({
-                        ...prev,
-                        [index]: { ...prev[index], isPlaying: false }
-                    }));
-                    if (playingIndex === index) setPlayingIndex(null);
-                });
-                
-                player.on('ended', () => {
-                    setAudioStates(prev => ({
-                        ...prev,
-                        [index]: { ...prev[index], isPlaying: false, currentTime: '00:00' }
-                    }));
-                    if (playingIndex === index) setPlayingIndex(null);
-                });
-                
-                player.on('timeupdate', (time) => {
-                    setAudioStates(prev => ({
-                        ...prev,
-                        [index]: { ...prev[index], currentTime: formatTime(time) }
-                    }));
-                });
-                
-                player.on('canplay', () => {
-                    const dur = player.getDuration();
-                    setAudioStates(prev => ({
-                        ...prev,
-                        [index]: { ...prev[index], duration: formatTime(dur) }
-                    }));
-                });
-            } else {
-                audioRef.addEventListener('play', () => {
-                    setAudioStates(prev => ({
-                        ...prev,
-                        [index]: { ...prev[index], isPlaying: true }
-                    }));
-                    setPlayingIndex(index);
-                });
-                
-                audioRef.addEventListener('pause', () => {
-                    setAudioStates(prev => ({
-                        ...prev,
-                        [index]: { ...prev[index], isPlaying: false }
-                    }));
-                    if (playingIndex === index) setPlayingIndex(null);
-                });
-                
-                audioRef.addEventListener('ended', () => {
-                    setAudioStates(prev => ({
-                        ...prev,
-                        [index]: { ...prev[index], isPlaying: false, currentTime: '00:00' }
-                    }));
-                    if (playingIndex === index) setPlayingIndex(null);
-                });
-                
-                audioRef.addEventListener('timeupdate', () => {
-                    setAudioStates(prev => ({
-                        ...prev,
-                        [index]: { ...prev[index], currentTime: formatTime(audioRef.currentTime) }
-                    }));
-                });
-                
-                audioRef.addEventListener('canplay', () => {
-                    setAudioStates(prev => ({
-                        ...prev,
-                        [index]: { ...prev[index], duration: formatTime(audioRef.duration) }
-                    }));
-                });
-            }
+            waveSurferInstances.current[index] = wavesurfer;
 
-            setTimeout(() => {
-                const textElements = waveformRef.querySelectorAll('text, .time-label, .axis-label');
-                textElements.forEach(el => {
-                    el.style.display = 'none';
-                });
-                
-                const svgTexts = waveformRef.querySelectorAll('svg text');
-                svgTexts.forEach(el => {
-                    el.style.display = 'none';
-                });
-            }, 100);
-        });
+            wavesurfer.on('ready', () => {
+                const duration = wavesurfer.getDuration();
+                setAudioStates(prev => ({
+                    ...prev,
+                    [index]: { 
+                        ...prev[index], 
+                        isLoaded: true,
+                        duration: formatTime(duration)
+                    }
+                }));
+            });
+
+            wavesurfer.on('play', () => {
+                setAudioStates(prev => ({
+                    ...prev,
+                    [index]: { ...prev[index], isPlaying: true }
+                }));
+                setPlayingIndex(index);
+            });
+
+            wavesurfer.on('pause', () => {
+                setAudioStates(prev => ({
+                    ...prev,
+                    [index]: { ...prev[index], isPlaying: false }
+                }));
+                if (playingIndex === index) setPlayingIndex(null);
+            });
+
+            wavesurfer.on('finish', () => {
+                setAudioStates(prev => ({
+                    ...prev,
+                    [index]: { 
+                        ...prev[index], 
+                        isPlaying: false, 
+                        currentTime: '00:00' 
+                    }
+                }));
+                if (playingIndex === index) setPlayingIndex(null);
+            });
+
+            wavesurfer.on('audioprocess', () => {
+                const currentTime = wavesurfer.getCurrentTime();
+                setAudioStates(prev => ({
+                    ...prev,
+                    [index]: { 
+                        ...prev[index], 
+                        currentTime: formatTime(currentTime) 
+                    }
+                }));
+            });
+
+            wavesurfer.on('seek', () => {
+                const currentTime = wavesurfer.getCurrentTime();
+                setAudioStates(prev => ({
+                    ...prev,
+                    [index]: { 
+                        ...prev[index], 
+                        currentTime: formatTime(currentTime) 
+                    }
+                }));
+            });
+
+            wavesurfer.on('error', (error) => {
+                console.error('WaveSurfer error for sample', index, ':', error);
+                toast.error(`Failed to load audio for ${sample.title}`);
+            });
+
+            wavesurfer.load(sample.sample_url);
+
+        } catch (error) {
+            console.error('Error initializing WaveSurfer for sample', index, ':', error);
+        }
     };
 
     useEffect(() => {
         if (samples.length > 0) {
-            samples.forEach((sample, index) => {
-                const audioRef = audioRefs.current[index];
-                if (audioRef && audioRef.readyState >= 2) {
-                    initializePeaks(sample, index);
-                } else if (audioRef) {
-                    audioRef.addEventListener('loadedmetadata', () => initializePeaks(sample, index), { once: true });
-                }
-            });
+            const timer = setTimeout(() => {
+                samples.forEach((sample, index) => {
+                    if (waveformRefs.current[index]) {
+                        initializeWaveSurfer(sample, index);
+                    }
+                });
+            }, 100);
+
+            return () => clearTimeout(timer);
         }
 
         return () => {
-            Object.values(peaksInstances.current).forEach(peaks => {
-                if (peaks && typeof peaks.destroy === 'function') {
-                    peaks.destroy();
+            Object.values(waveSurferInstances.current).forEach(wavesurfer => {
+                if (wavesurfer && typeof wavesurfer.destroy === 'function') {
+                    try {
+                        wavesurfer.destroy();
+                    } catch (error) {
+                        console.warn('Error destroying WaveSurfer instance:', error);
+                    }
                 }
             });
-            peaksInstances.current = {};
+            waveSurferInstances.current = {};
         };
     }, [samples]);
 
     const togglePlayPause = (index) => {
-        const peaksInstance = peaksInstances.current[index];
-        const audioRef = audioRefs.current[index];
+        const wavesurfer = waveSurferInstances.current[index];
         const audioState = audioStates[index];
         
-        if (!peaksInstance || !audioState?.isLoaded) return;
+        if (!wavesurfer || !audioState?.isLoaded) {
+            console.warn(`WaveSurfer instance or audio not ready for index ${index}`);
+            return;
+        }
 
         if (playingIndex !== null && playingIndex !== index) {
-            const otherPeaks = peaksInstances.current[playingIndex];
-            const otherAudio = audioRefs.current[playingIndex];
-            
-            if (otherPeaks?.player?.pause) {
-                otherPeaks.player.pause();
-            } else if (otherAudio) {
-                otherAudio.pause();
+            const otherWaveSurfer = waveSurferInstances.current[playingIndex];
+            if (otherWaveSurfer && typeof otherWaveSurfer.isPlaying === 'function' && otherWaveSurfer.isPlaying()) {
+                otherWaveSurfer.pause();
             }
         }
         
-        const player = peaksInstance.player;
-        
-        if (audioState.isPlaying) {
-            if (player && typeof player.pause === 'function') {
-                player.pause();
+        try {
+            if (audioState.isPlaying) {
+                wavesurfer.pause();
             } else {
-                audioRef.pause();
+                wavesurfer.play();
             }
-        } else {
-            if (player && typeof player.play === 'function') {
-                player.play();
-            } else {
-                audioRef.play();
-            }
-        }
-    };
-
-    const handleWaveformClick = (event, index) => {
-        const peaksInstance = peaksInstances.current[index];
-        const waveformRef = waveformRefs.current[index];
-        const audioRef = audioRefs.current[index];
-        const audioState = audioStates[index];
-        
-        if (!peaksInstance || !audioState?.isLoaded) return;
-        
-        const rect = waveformRef.getBoundingClientRect();
-        const clickX = event.clientX - rect.left;
-        const containerWidth = rect.width;
-        const clickRatio = clickX / containerWidth;
-        
-        const player = peaksInstance.player;
-        
-        let duration;
-        if (player && typeof player.getDuration === 'function') {
-            duration = player.getDuration();
-        } else {
-            duration = audioRef.duration;
-        }
-        
-        const seekTime = duration * clickRatio;
-        
-        if (player && typeof player.seek === 'function') {
-            player.seek(seekTime);
-        } else {
-            audioRef.currentTime = seekTime;
+        } catch (error) {
+            console.error('Error toggling play/pause:', error);
         }
     };
 
@@ -499,9 +410,9 @@ function Samples(){
                 
                 setSamples(prev => prev.filter((_, i) => i !== sampleIndex));
                 
-                if (peaksInstances.current[sampleIndex]) {
-                    peaksInstances.current[sampleIndex].destroy();
-                    delete peaksInstances.current[sampleIndex];
+                if (waveSurferInstances.current[sampleIndex]) {
+                    waveSurferInstances.current[sampleIndex].destroy();
+                    delete waveSurferInstances.current[sampleIndex];
                 }
                 
                 setAudioStates(prev => {
@@ -672,8 +583,6 @@ function Samples(){
                                                 <div 
                                                     className='wave' 
                                                     ref={el => waveformRefs.current[index] = el}
-                                                    onClick={(e) => handleWaveformClick(e, index)}
-                                                    style={{ cursor: 'pointer' }}
                                                 ></div>
                                                 <div className='time'>
                                                     <p>{audioStates[index]?.currentTime || '00:00'}</p>
@@ -700,14 +609,6 @@ function Samples(){
                                     </div>
                                     <p>{formatDate(sample.created_at)}</p>
                                 </div>
-                                
-                                {/* Audio element for each sample */}
-                                <audio 
-                                    ref={el => audioRefs.current[index] = el}
-                                    src={sample.sample_url} 
-                                    preload="metadata"
-                                    style={{ display: 'none' }}
-                                />
                             </motion.div>
                         ))}
                     </motion.div>
