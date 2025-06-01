@@ -287,4 +287,62 @@ router.delete('/samples/:id', async (req, res) => {
   }
 });
 
+router.put('/samples/:id/save', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { user_id } = req.body;
+
+    if (!user_id) {
+      return res.status(400).json({ 
+        error: 'User ID is required' 
+      });
+    }
+
+    const { data: sample, error: fetchError } = await supabase
+      .from('samples')
+      .select('*')
+      .eq('id', id)
+      .eq('user_id', user_id) 
+      .single();
+
+    if (fetchError || !sample) {
+      return res.status(404).json({ 
+        error: 'Sample not found or you do not have permission to save it' 
+      });
+    }
+
+    const newSavedStatus = !sample.saved;
+
+    const { data: updatedSample, error: updateError } = await supabaseAdmin
+      .from('samples')
+      .update({ saved: newSavedStatus })
+      .eq('id', id)
+      .eq('user_id', user_id)
+      .select()
+      .single();
+
+    if (updateError) {
+      console.error('Database update error:', updateError);
+      return res.status(500).json({ 
+        error: 'Failed to update sample save status',
+        details: updateError.message 
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `Sample "${sample.title}" ${newSavedStatus ? 'saved' : 'unsaved'} successfully!`,
+      sample: updatedSample,
+      saved: newSavedStatus
+    });
+
+  } catch (error) {
+    console.error('Save sample error:', error);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
+    });
+  }
+});
+
 export default router;

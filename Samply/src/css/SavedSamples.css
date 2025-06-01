@@ -125,9 +125,9 @@
   height: 26%;
   width: 100%;
 }
-.heart-icon{
+.save-icon{
   transition: 0.3s;
 }
-.heart-icon:hover{
+.save-icon:hover{
   scale: 1.2;
 }

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import AnimatedBackground from "../components/background/AnimatedBackground";
-import { CircleUser, Heart, ArrowDownToLine, Play  } from 'lucide-react';
+import { CircleUser, SaveOff, ArrowDownToLine, Play  } from 'lucide-react';
 import '../css/SavedSamples.css';
 function SavedSamples() {
     const navigate = useNavigate();
@@ -45,8 +45,8 @@ function SavedSamples() {
                                 </div>
                                 <div className='prompt-saved-sample'>
                                     <div className='like-icon'>
-                                        <div className='heart-icon'>
-                                            <Heart  size={32} strokeWidth={1} color='#fff'/>
+                                        <div className='save-icon'>
+                                            <SaveOff   size={32} strokeWidth={1} color='#fff'/>
                                         </div>
                                     </div>
                                     <p>Craft a smooth jazz melody with a walking bassline, mellow piano chords, and a soulful saxophone lead. Add soft brush drums and a touch of vibraphone for a cozy, late-night lounge vibe.</p>

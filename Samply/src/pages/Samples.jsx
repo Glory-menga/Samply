@@ -87,6 +87,7 @@ function Samples(){
         sampleIndex: null,
         isDeleting: false
     });
+    const [savingIndex, setSavingIndex] = useState(null);
 
     const titleVariants = {
         hidden: { opacity: 0, y: -30 },
@@ -368,6 +369,39 @@ function Samples(){
         }
     };
 
+    const handleSaveSample = async (sampleId, sampleName, index) => {
+        setSavingIndex(index);
+        
+        try {
+            const response = await fetch(`http://localhost:5000/api/community/samples/${sampleId}/save`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user_id: user.id })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                toast.success(`${sampleName} is saved!`);
+                
+                // Update the sample in local state
+                setSamples(prev => prev.map((sample, i) => 
+                    i === index ? { ...sample, saved: result.saved } : sample
+                ));
+            } else {
+                console.error('Save error:', result);
+                toast.error(result.error || 'Failed to save sample');
+            }
+        } catch (error) {
+            console.error('Error saving sample:', error);
+            toast.error('Failed to save sample');
+        } finally {
+            setSavingIndex(null);
+        }
+    };
+
     const openDeleteModal = (sampleId, sampleName, index) => {
         setDeleteModal({
             isOpen: true,
@@ -550,6 +584,30 @@ function Samples(){
                                             <p>{sample.title}</p>
                                         </div>
                                         <div className='sample-icons'>
+                                            {!sample.saved && (
+                                                <button 
+                                                    onClick={() => handleSaveSample(sample.id, sample.title, index)}
+                                                    disabled={savingIndex === index}
+                                                    title="Save sample"
+                                                    style={{
+                                                        opacity: savingIndex === index ? 0.5 : 1,
+                                                        cursor: savingIndex === index ? 'not-allowed' : 'pointer'
+                                                    }}
+                                                >
+                                                    {savingIndex === index ? (
+                                                        <div style={{
+                                                            width: '32px', 
+                                                            height: '32px', 
+                                                            border: '2px solid #fff',
+                                                            borderTop: '2px solid transparent',
+                                                            borderRadius: '50%',
+                                                            animation: 'spin 1s linear infinite'
+                                                        }}></div>
+                                                    ) : (
+                                                        <Save size={32} strokeWidth={1} color='#fff'/>
+                                                    )}
+                                                </button>
+                                            )}
                                             <button 
                                                 onClick={() => handleDownload(sample, index)}
                                                 title="Download"
