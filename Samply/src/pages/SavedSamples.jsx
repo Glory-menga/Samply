@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import WaveSurfer from 'wavesurfer.js';
 import AnimatedBackground from "../components/background/AnimatedBackground";
 import { CircleUser, SaveOff, ArrowDownToLine, Play, Pause, Lock, LogIn } from 'lucide-react';
@@ -530,7 +531,7 @@ function SavedSamples() {
                             animate="visible"
                         >
                             <p>No saved samples yet.</p>
-                            <p>Save some samples from your <a href="/samples" style={{color: '#fff', textDecoration: 'underline'}}>posted samples</a> to see them here!</p>
+                            <p>Save some samples from your <Link to={'/samples'}>posted samples</Link> to see them here!</p>
                         </motion.div>
                     ) : (
                         <motion.div 

@@ -5,7 +5,6 @@
   padding-top: 80px;
   width: 100%;
 }
-
 .community-container h4{
   margin-top: 15px;
 }
@@ -25,6 +24,10 @@
   width: 340px;
   padding: 10px;
   margin-right: 15px;
+  transition: all 0.3s ease;
+}
+.popular-post:hover{
+  transform: translateY(-2px);
 }
 .profile-popular-post{
   display: flex;
@@ -37,19 +40,39 @@
 }
 .popular-post-icons{
   display: flex;
-  gap: 4px;
+  gap: 12px;
+  align-items: center;
 }
 .popular-post-icons button{
   cursor: pointer;
   border: none;
   background: none;
   transition: 0.3s;
+  padding: 4px;
+  border-radius: 4px;
 }
 .popular-post-icons button:hover{
   cursor: pointer;
   border: none;
   background: none;
-  scale: 1.2;
+  scale: 1.1;
+}
+.popular-heart-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.popular-heart-btn:hover {
+  scale: 1.1;
+}
+.like-count {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
 }
 .title-popular-post{
   margin-top: 5px;
@@ -58,6 +81,7 @@
 .audio-popular-post{
   display: flex;
   flex-direction: row;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
@@ -65,9 +89,36 @@
   cursor: pointer;
   border: none;
   background: none;
+  transition: all 0.3s ease;
+  border-radius: 50%;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.audio-popular-post button:hover{
+  scale: 1.1;
+}
+.audio-popular-post button:disabled{
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.audio-popular-post button:disabled:hover{
+  background: none;
+  scale: 1;
 }
 .wave-popular-post{
   width: 100%;
+}
+.waveform {
+    width: 100%;
+    transition: 0.6s;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.waveform:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 .timestamps-popular-post{
   display: flex;
@@ -75,6 +126,11 @@
   justify-content: space-between;
   margin-top: 5px;
   font-size: 12px;
+}
+.timestamps-popular-post p{
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
 }
 .posts-container{
   margin-top: 120px;
@@ -90,6 +146,10 @@
   width: 100%;
   justify-content: space-between;
   margin-bottom: 50px;
+  transition: all 0.3s ease;
+}
+.post:hover{
+  transform: translateY(-2px);
 }
 .audio-post{
   display: flex;
@@ -112,6 +172,8 @@
 }
 .prompt-post p{
   width: 70%;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
 }
 .intro-post{
   display: flex;
@@ -128,6 +190,19 @@
   flex-direction: row;
   align-items: center;
   gap: 15px;
+}
+.profile-post-info p{
+  margin: 0;
+  font-size: 16px;
+}
+.profile-pic-post {
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+.profile-pic-post:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
 }
 .post-title{
   margin-left: 56px;
@@ -147,7 +222,7 @@
   transition: 0.3s;
 }
 .post-icon:hover{
-  scale: 1.2;
+  scale: 1.1;
 }
 .post-icon p{
   position: relative;
@@ -185,15 +260,46 @@
   border: none;
   cursor: pointer;
   background: none;
+  transition: all 0.3s ease;
+  border-radius: 50%;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.waveform-post button:disabled{
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.waveform-post button:disabled:hover{
+  background: none;
+  scale: 1;
 }
 .waveform-details{
   width: 80%;
+}
+.waveform-container-post {
+   width: 100%;
+    height: 60px;
+    min-height: 60px;
+    transition: 0.6s;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.waveform-container-post:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 .timestamps-wave-post{
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   margin-top: 10px;
+}
+.timestamps-wave-post p{
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
 }
 .wave-icons{
   display: flex;
@@ -206,7 +312,35 @@
   align-items: center;
   gap: 10px;
   transition: 0.3s;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 }
 .wave-icon:hover{
-  scale: 1.2;
+  scale: 1.1;
+  color: #fff;
 }
+.wave-icon p{
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Loading and Empty States */
+.loading-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  color: #fff;
+  font-size: 16px;
+}
+
+.no-content-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+}
+

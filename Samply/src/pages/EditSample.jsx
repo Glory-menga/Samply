@@ -36,11 +36,10 @@ function EditSample(){
     const tempoLevels = ['Very Fast', 'Fast', 'Normal', 'Slow', 'Very Slow'];
     const tempoMultipliers = [2, 1.5, 1, 0.75, 0.5];
 
-    // Function to convert AudioBuffer to WAV format
     const audioBufferToWav = (audioBuffer) => {
         const numberOfChannels = audioBuffer.numberOfChannels;
         const sampleRate = audioBuffer.sampleRate;
-        const format = 1; // PCM
+        const format = 1;
         const bitDepth = 16;
 
         const bytesPerSample = bitDepth / 8;
@@ -49,7 +48,6 @@ function EditSample(){
         const buffer = new ArrayBuffer(44 + audioBuffer.length * numberOfChannels * bytesPerSample);
         const view = new DataView(buffer);
 
-        // Write WAV header
         const writeString = (offset, string) => {
             for (let i = 0; i < string.length; i++) {
                 view.setUint8(offset + i, string.charCodeAt(i));
@@ -71,7 +69,6 @@ function EditSample(){
         writeString(offset, 'data'); offset += 4;
         view.setUint32(offset, audioBuffer.length * numberOfChannels * bytesPerSample, true); offset += 4;
 
-        // Write audio data
         const channels = [];
         for (let i = 0; i < numberOfChannels; i++) {
             channels.push(audioBuffer.getChannelData(i));
@@ -195,7 +192,6 @@ function EditSample(){
             webAudioAnalyserRef.current.fftSize = 256;
             webAudioAnalyserRef.current.smoothingTimeConstant = 0.8;
 
-            // Create a destination for recording
             destinationRef.current = audioContext.createMediaStreamDestination();
 
             playerRef.current.connect(pitchShiftRef.current);
@@ -206,7 +202,6 @@ function EditSample(){
             const toneNode = pitchShiftRef.current.output;
             toneNode.connect(webAudioAnalyserRef.current);
             
-            // Connect to recording destination
             toneNode.connect(destinationRef.current);
 
             playerRef.current.onstop = () => {
@@ -285,12 +280,10 @@ function EditSample(){
             setIsDownloading(true);
             recordedChunksRef.current = [];
 
-            // Ensure Tone.js context is running
             if (Tone.context.state !== 'running') {
                 await Tone.start();
             }
 
-            // Create MediaRecorder
             const mediaRecorder = new MediaRecorder(destinationRef.current.stream, {
                 mimeType: 'audio/webm;codecs=opus'
             });
@@ -306,12 +299,10 @@ function EditSample(){
                 try {
                     const webmBlob = new Blob(recordedChunksRef.current, { type: 'audio/webm' });
                     
-                    // Convert WebM to WAV using Web Audio API
                     const arrayBuffer = await webmBlob.arrayBuffer();
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
                     
-                    // Convert AudioBuffer to WAV
                     const wavBlob = audioBufferToWav(audioBuffer);
                     
                     const url = URL.createObjectURL(wavBlob);
@@ -324,7 +315,6 @@ function EditSample(){
                     document.body.removeChild(a);
                 } catch (conversionError) {
                     console.error('Error converting to WAV, falling back to WebM:', conversionError);
-                    // Fallback to original WebM if conversion fails
                     const blob = new Blob(recordedChunksRef.current, { type: 'audio/webm' });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
@@ -336,7 +326,6 @@ function EditSample(){
                     document.body.removeChild(a);
                 }
                 
-                // Ensure the sample is stopped and paused after download
                 if (playerRef.current && playerRef.current.state === 'started') {
                     playerRef.current.stop();
                 }
@@ -346,35 +335,28 @@ function EditSample(){
                 setIsDownloading(false);
             };
 
-            // Start recording
             mediaRecorder.start();
 
-            // Temporarily disable looping for recording
             const wasLooping = isLooping;
             if (playerRef.current) {
                 playerRef.current.loop = false;
             }
 
-            // Start playback
             Tone.Transport.start();
             playerRef.current.start();
             setIsPlaying(true);
 
-            // Calculate the duration of the edited sample
-            const recordingDuration = (duration / tempoMultipliers[tempoValue]) * 1000; // Convert to milliseconds
+            const recordingDuration = (duration / tempoMultipliers[tempoValue]) * 1000; 
 
-            // Stop recording after the sample finishes
             setTimeout(() => {
                 if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
                     mediaRecorderRef.current.stop();
                 }
                 
-                // Stop playback
                 if (playerRef.current && playerRef.current.state === 'started') {
                     playerRef.current.stop();
                 }
                 
-                // Restore original looping setting
                 if (playerRef.current) {
                     playerRef.current.loop = wasLooping;
                 }
@@ -382,7 +364,7 @@ function EditSample(){
                 Tone.Transport.stop();
                 setIsPlaying(false);
                 setCurrentTime(0);
-            }, recordingDuration + 100); // Add small buffer
+            }, recordingDuration + 100); 
 
         } catch (error) {
             console.error('Error recording audio:', error);
@@ -390,10 +372,6 @@ function EditSample(){
             setIsDownloading(false);
             setIsPlaying(false);
         }
-    };
-
-    const handleSave = () => {
-        alert('Save functionality will be implemented based on your requirements.');
     };
 
     const formatTime = (seconds) => {
@@ -551,9 +529,6 @@ function EditSample(){
                     </div>
                 </div>
                 <div className='edit-sample-icons'>
-                    <button onClick={handleSave}>
-                        <Save size={32} strokeWidth={1} color='#fff'/>
-                    </button>
                     <button 
                         onClick={handleDownload}
                         disabled={!audioLoaded || isDownloading}

@@ -330,7 +330,7 @@ router.put('/samples/:id/save', async (req, res) => {
       .from('samples')
       .select('*')
       .eq('id', id)
-      .eq('user_id', user_id) 
+      .eq('user_id', user_id)
       .single();
 
     if (fetchError || !sample) {
@@ -366,6 +366,113 @@ router.put('/samples/:id/save', async (req, res) => {
 
   } catch (error) {
     console.error('Save sample error:', error);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
+    });
+  }
+});
+
+router.get('/popular-samples', async (req, res) => {
+  try {
+    const { data: samples, error } = await supabase
+      .from('samples')
+      .select('*')
+      .order('likes_count', { ascending: false })
+      .limit(5);
+
+    if (error) {
+      return res.status(500).json({ 
+        error: 'Failed to fetch popular samples',
+        details: error.message 
+      });
+    }
+
+    const samplesWithUsers = await Promise.all(
+      samples.map(async (sample) => {
+        try {
+          const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.getUserById(sample.user_id);
+          
+          return {
+            ...sample,
+            user: {
+              id: user?.id || sample.user_id,
+              username: user?.user_metadata?.username || user?.email?.split('@')[0] || 'Unknown User',
+              profile_picture: user?.user_metadata?.profile_picture || null,
+              email: user?.email || null
+            }
+          };
+        } catch (userError) {
+          console.warn(`Failed to fetch user data for user_id: ${sample.user_id}`, userError);
+          return {
+            ...sample,
+            user: {
+              id: sample.user_id,
+              username: 'Unknown User',
+              profile_picture: null,
+              email: null
+            }
+          };
+        }
+      })
+    );
+
+    res.json({ samples: samplesWithUsers });
+  } catch (error) {
+    console.error('Fetch popular samples error:', error);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
+    });
+  }
+});
+
+router.get('/samples-with-users', async (req, res) => {
+  try {
+    const { data: samples, error } = await supabase
+      .from('samples')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      return res.status(500).json({ 
+        error: 'Failed to fetch samples',
+        details: error.message 
+      });
+    }
+
+    const samplesWithUsers = await Promise.all(
+      samples.map(async (sample) => {
+        try {
+          const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.getUserById(sample.user_id);
+          
+          return {
+            ...sample,
+            user: {
+              id: user?.id || sample.user_id,
+              username: user?.user_metadata?.username || user?.email?.split('@')[0] || 'Unknown User',
+              profile_picture: user?.user_metadata?.profile_picture || null,
+              email: user?.email || null
+            }
+          };
+        } catch (userError) {
+          console.warn(`Failed to fetch user data for user_id: ${sample.user_id}`, userError);
+          return {
+            ...sample,
+            user: {
+              id: sample.user_id,
+              username: 'Unknown User',
+              profile_picture: null,
+              email: null
+            }
+          };
+        }
+      })
+    );
+
+    res.json({ samples: samplesWithUsers });
+  } catch (error) {
+    console.error('Fetch samples with users error:', error);
     res.status(500).json({ 
       error: 'Internal server error',
       details: error.message 
