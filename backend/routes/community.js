@@ -373,6 +373,214 @@ router.put('/samples/:id/save', async (req, res) => {
   }
 });
 
+
+router.post('/samples/:id/like', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { user_id } = req.body;
+
+    if (!user_id) {
+      return res.status(400).json({ 
+        error: 'User ID is required' 
+      });
+    }
+
+    const { data: existingLike, error: likeCheckError } = await supabase
+      .from('likes')
+      .select('*')
+      .eq('user_id', user_id)
+      .eq('sample_id', id)
+      .single();
+
+    let isLiking = true;
+
+    if (existingLike && !likeCheckError) {
+      const { error: deleteError } = await supabaseAdmin
+        .from('likes')
+        .delete()
+        .eq('user_id', user_id)
+        .eq('sample_id', id);
+
+      if (deleteError) {
+        console.error('Delete like error:', deleteError);
+        return res.status(500).json({ 
+          error: 'Failed to unlike sample',
+          details: deleteError.message 
+        });
+      }
+      isLiking = false;
+    } else {
+      const { error: insertError } = await supabaseAdmin
+        .from('likes')
+        .insert([
+          {
+            user_id,
+            sample_id: id,
+            liked_at: new Date().toISOString()
+          }
+        ]);
+
+      if (insertError) {
+        console.error('Insert like error:', insertError);
+        return res.status(500).json({ 
+          error: 'Failed to like sample',
+          details: insertError.message 
+        });
+      }
+    }
+
+    const { data: likesCount, error: countError } = await supabase
+      .from('likes')
+      .select('id', { count: 'exact' })
+      .eq('sample_id', id);
+
+    if (countError) {
+      console.error('Count likes error:', countError);
+      return res.status(500).json({ 
+        error: 'Failed to count likes',
+        details: countError.message 
+      });
+    }
+
+    const newLikesCount = likesCount.length;
+
+    const { error: updateError } = await supabaseAdmin
+      .from('samples')
+      .update({ likes_count: newLikesCount })
+      .eq('id', id);
+
+    if (updateError) {
+      console.error('Update likes count error:', updateError);
+      return res.status(500).json({ 
+        error: 'Failed to update likes count',
+        details: updateError.message 
+      });
+    }
+
+    res.json({
+      success: true,
+      message: isLiking ? 'Sample liked successfully!' : 'Sample unliked successfully!',
+      liked: isLiking,
+      likes_count: newLikesCount
+    });
+
+  } catch (error) {
+    console.error('Like sample error:', error);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
+    });
+  }
+});
+
+router.get('/user-likes/:user_id', async (req, res) => {
+  try {
+    const { user_id } = req.params;
+
+    const { data: likes, error } = await supabase
+      .from('likes')
+      .select('*')
+      .eq('user_id', user_id)
+      .order('liked_at', { ascending: false });
+
+    if (error) {
+      console.error('Fetch user likes error:', error);
+      return res.status(500).json({ 
+        error: 'Failed to fetch user likes',
+        details: error.message 
+      });
+    }
+
+    res.json({ likes: likes || [] });
+  } catch (error) {
+    console.error('Fetch user likes error:', error);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
+    });
+  }
+});
+
+router.get('/user-liked-samples/:user_id', async (req, res) => {
+  try {
+    const { user_id } = req.params;
+
+    const { data: likes, error: likesError } = await supabase
+      .from('likes')
+      .select('sample_id')
+      .eq('user_id', user_id)
+      .order('liked_at', { ascending: false });
+
+    if (likesError) {
+      console.error('Fetch likes error:', likesError);
+      return res.status(500).json({ 
+        error: 'Failed to fetch liked samples',
+        details: likesError.message 
+      });
+    }
+
+    if (!likes || likes.length === 0) {
+      return res.json({ samples: [] });
+    }
+
+    const sampleIds = likes.map(like => like.sample_id);
+
+    const { data: samples, error: samplesError } = await supabase
+      .from('samples')
+      .select('*')
+      .in('id', sampleIds);
+
+    if (samplesError) {
+      console.error('Fetch samples error:', samplesError);
+      return res.status(500).json({ 
+        error: 'Failed to fetch sample details',
+        details: samplesError.message 
+      });
+    }
+
+    const samplesWithUsers = await Promise.all(
+      samples.map(async (sample) => {
+        try {
+          const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.getUserById(sample.user_id);
+          
+          return {
+            ...sample,
+            user: {
+              id: user?.id || sample.user_id,
+              username: user?.user_metadata?.username || user?.email?.split('@')[0] || 'Unknown User',
+              profile_picture: user?.user_metadata?.profile_picture || null,
+              email: user?.email || null
+            }
+          };
+        } catch (userError) {
+          console.warn(`Failed to fetch user data for user_id: ${sample.user_id}`, userError);
+          return {
+            ...sample,
+            user: {
+              id: sample.user_id,
+              username: 'Unknown User',
+              profile_picture: null,
+              email: null
+            }
+          };
+        }
+      })
+    );
+
+    const orderedSamples = sampleIds.map(id => 
+      samplesWithUsers.find(sample => sample.id === id)
+    ).filter(Boolean);
+
+    res.json({ samples: orderedSamples });
+  } catch (error) {
+    console.error('Fetch user liked samples error:', error);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
+    });
+  }
+});
+
 router.get('/popular-samples', async (req, res) => {
   try {
     const { data: samples, error } = await supabase

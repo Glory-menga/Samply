@@ -99,14 +99,6 @@
 .audio-popular-post button:hover{
   scale: 1.1;
 }
-.audio-popular-post button:disabled{
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-.audio-popular-post button:disabled:hover{
-  background: none;
-  scale: 1;
-}
 .wave-popular-post{
   width: 100%;
 }
@@ -266,14 +258,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.waveform-post button:disabled{
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-.waveform-post button:disabled:hover{
-  background: none;
-  scale: 1;
 }
 .waveform-details{
   width: 80%;

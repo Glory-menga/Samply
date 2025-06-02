@@ -17,7 +17,7 @@ function Community(){
     const popularWaveSurferInstances = useRef({});
     
     const [playingIndex, setPlayingIndex] = useState(null);
-    const [playingSection, setPlayingSection] = useState(null);
+    const [playingSection, setPlayingSection] = useState(null); 
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [popularSamples, setPopularSamples] = useState([]);
@@ -26,6 +26,8 @@ function Community(){
     const [loadingSamples, setLoadingSamples] = useState(false);
     const [audioStates, setAudioStates] = useState({});
     const [popularAudioStates, setPopularAudioStates] = useState({});
+    const [likedSamples, setLikedSamples] = useState(new Set());
+    const [popularLikedSamples, setPopularLikedSamples] = useState(new Set());
 
     const titleVariants = {
         hidden: { opacity: 0, y: -30 },
@@ -90,7 +92,33 @@ function Community(){
     useEffect(() => {
         fetchPopularSamples();
         fetchAllSamples();
-    }, []);
+        if (user) {
+            fetchUserLikes();
+        }
+    }, [user]);
+
+    const fetchUserLikes = async () => {
+        if (!user) return;
+        
+        try {
+            const response = await fetch(`http://localhost:5000/api/community/user-likes/${user.id}`);
+            const data = await response.json();
+            
+            if (response.ok) {
+                const likedSampleIds = new Set(data.likes.map(like => like.sample_id));
+                setLikedSamples(likedSampleIds);
+                setPopularLikedSamples(likedSampleIds);
+            } else {
+                console.error('Failed to fetch user likes:', data.error);
+                setLikedSamples(new Set());
+                setPopularLikedSamples(new Set());
+            }
+        } catch (error) {
+            console.error('Error fetching user likes:', error);
+            setLikedSamples(new Set());
+            setPopularLikedSamples(new Set());
+        }
+    };
 
     const fetchPopularSamples = async () => {
         setLoadingPopular(true);
@@ -152,6 +180,82 @@ function Community(){
         }
     };
 
+    const handleLike = async (sampleId, section = 'posts', index) => {
+        if (!user) {
+            toast.error('Please log in to like samples');
+            return;
+        }
+
+        const isCurrentlyLiked = section === 'popular' 
+            ? popularLikedSamples.has(sampleId) 
+            : likedSamples.has(sampleId);
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/community/samples/${sampleId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: user.id
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                if (section === 'popular') {
+                    setPopularLikedSamples(prev => {
+                        const newSet = new Set(prev);
+                        if (isCurrentlyLiked) {
+                            newSet.delete(sampleId);
+                        } else {
+                            newSet.add(sampleId);
+                        }
+                        return newSet;
+                    });
+
+                    setPopularSamples(prev => prev.map(sample => 
+                        sample.id === sampleId 
+                            ? { ...sample, likes_count: data.likes_count }
+                            : sample
+                    ));
+                } else {
+                    setLikedSamples(prev => {
+                        const newSet = new Set(prev);
+                        if (isCurrentlyLiked) {
+                            newSet.delete(sampleId);
+                        } else {
+                            newSet.add(sampleId);
+                        }
+                        return newSet;
+                    });
+
+                    setAllSamples(prev => prev.map(sample => 
+                        sample.id === sampleId 
+                            ? { ...sample, likes_count: data.likes_count }
+                            : sample
+                    ));
+                }
+
+                const sample = section === 'popular' 
+                    ? popularSamples[index] 
+                    : allSamples[index];
+                
+                if (isCurrentlyLiked) {
+                    toast.info(`You unliked "${sample.title}"`);
+                } else {
+                    toast.success(`You liked "${sample.title}"`);
+                }
+            } else {
+                toast.error(data.error || 'Failed to update like');
+            }
+        } catch (error) {
+            console.error('Error toggling like:', error);
+            toast.error('Failed to update like');
+        }
+    };
+
     const formatTime = (seconds) => {
         if (isNaN(seconds)) return '00:00';
         const minutes = Math.floor(seconds / 60);
@@ -171,7 +275,7 @@ function Community(){
         return `${Math.floor(diffInSeconds / 604800)}w ago`;
     };
 
-    const initializeWaveSurfer = (sample, index, section = 'posts') => {
+    const initializeWaveSurfer = async (sample, index, section = 'posts') => {
         const waveformRef = section === 'popular' 
             ? popularWaveformRefs.current[index] 
             : waveformRefs.current[index];
@@ -179,9 +283,17 @@ function Community(){
             ? popularWaveSurferInstances.current 
             : waveSurferInstances.current;
         
-        if (!waveformRef || instances[index]) return;
+        if (!waveformRef || instances[index]) {
+            return;
+        }
 
         try {
+            const testResponse = await fetch(sample.sample_url, { method: 'HEAD' });
+            if (!testResponse.ok) {
+                toast.error(`Audio file not accessible for "${sample.title}"`);
+                return;
+            }
+
             const wavesurfer = WaveSurfer.create({
                 container: waveformRef,
                 waveColor: '#ffffff',
@@ -197,7 +309,8 @@ function Community(){
                 interact: true,
                 hideScrollbar: true,
                 fillParent: true,
-                responsive: true
+                responsive: true,
+                crossOrigin: 'anonymous'
             });
 
             instances[index] = wavesurfer;
@@ -286,6 +399,7 @@ function Community(){
 
         } catch (error) {
             console.error(`Error initializing WaveSurfer for ${section} sample`, index, ':', error);
+            toast.error(`Failed to initialize audio player for "${sample.title}"`);
         }
     };
 
@@ -294,10 +408,12 @@ function Community(){
             const timer = setTimeout(() => {
                 popularSamples.forEach((sample, index) => {
                     if (popularWaveformRefs.current[index]) {
-                        initializeWaveSurfer(sample, index, 'popular');
+                        setTimeout(() => {
+                            initializeWaveSurfer(sample, index, 'popular');
+                        }, index * 150);
                     }
                 });
-            }, 100);
+            }, 200);
 
             return () => clearTimeout(timer);
         }
@@ -308,10 +424,12 @@ function Community(){
             const timer = setTimeout(() => {
                 allSamples.forEach((sample, index) => {
                     if (waveformRefs.current[index]) {
-                        initializeWaveSurfer(sample, index, 'posts');
+                        setTimeout(() => {
+                            initializeWaveSurfer(sample, index, 'posts');
+                        }, index * 150);
                     }
                 });
-            }, 100);
+            }, 300);
 
             return () => clearTimeout(timer);
         }
@@ -349,7 +467,6 @@ function Community(){
         const audioState = audioStatesData[index];
         
         if (!wavesurfer || !audioState?.isLoaded) {
-            console.warn(`WaveSurfer instance or audio not ready for ${section} index ${index}`);
             return;
         }
 
@@ -371,6 +488,7 @@ function Community(){
             }
         } catch (error) {
             console.error('Error toggling play/pause:', error);
+            toast.error('Error playing audio');
         }
     };
 
@@ -454,8 +572,16 @@ function Community(){
                                                 <p>{sample.user?.username || 'Unknown User'}</p>
                                             </div>
                                             <div className='popular-post-icons'>
-                                                <button className='popular-heart-btn'>
-                                                    <Heart size={24} strokeWidth={1} color='#fff'/>
+                                                <button 
+                                                    className='popular-heart-btn'
+                                                    onClick={() => handleLike(sample.id, 'popular', index)}
+                                                >
+                                                    <Heart 
+                                                        size={24} 
+                                                        strokeWidth={1} 
+                                                        color='#fff'
+                                                        fill={popularLikedSamples.has(sample.id) ? '#fff' : 'none'}
+                                                    />
                                                     <span className='like-count'>{sample.likes_count}</span>
                                                 </button>
                                                 <button onClick={() => handleDownload(sample)}>
@@ -592,8 +718,17 @@ function Community(){
                                                 </div>
                                             </div>
                                             <div className='wave-icons'>
-                                                <div className='wave-icon'>
-                                                    <Heart size={28} strokeWidth={1} color='#fff'/>
+                                                <div 
+                                                    className='wave-icon'
+                                                    onClick={() => handleLike(sample.id, 'posts', index)}
+                                                    style={{ cursor: 'pointer' }}
+                                                >
+                                                    <Heart 
+                                                        size={28} 
+                                                        strokeWidth={1} 
+                                                        color='#fff'
+                                                        fill={likedSamples.has(sample.id) ? '#fff' : 'none'}
+                                                    />
                                                     <p>{sample.likes_count}</p>
                                                 </div>
                                                 <Link to='/comment-sample' className='wave-icon'>
