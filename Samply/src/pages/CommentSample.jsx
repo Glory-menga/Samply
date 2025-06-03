@@ -504,14 +504,6 @@ function CommentSample(){
                                             <p>{comment.user?.username || 'Unknown User'} - {formatTimeAgo(comment.created_at)}</p>
                                         </div>
                                         <div className='comment-icon'>
-                                            {/* Heart icon for visual purposes only - no functionality */}
-                                            <Heart 
-                                                size={30} 
-                                                strokeWidth={1} 
-                                                color='#fff'
-                                                fill='none'
-                                                style={{ opacity: 0.5, cursor: 'default' }}
-                                            />
                                             {user && comment.user_id === user.id && (
                                                 <button 
                                                     onClick={() => handleDeleteComment(comment.id)}
