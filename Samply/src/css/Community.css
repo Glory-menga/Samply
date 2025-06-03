@@ -40,7 +40,6 @@
 }
 .popular-post-icons{
   display: flex;
-  gap: 12px;
   align-items: center;
 }
 .popular-post-icons button{

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import WaveSurfer from 'wavesurfer.js';
 import AnimatedBackground from '../components/background/AnimatedBackground';
@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 import '../css/Community.css';
 
 function Community(){
+    const navigate = useNavigate();
     const waveformRefs = useRef({});
     const waveSurferInstances = useRef({});
     const popularWaveformRefs = useRef({});
@@ -123,7 +124,7 @@ function Community(){
     const fetchPopularSamples = async () => {
         setLoadingPopular(true);
         try {
-            const response = await fetch('http://localhost:5000/api/community/popular-samples');
+            const response = await fetch('http://localhost:5000/api/community/popular-samples-with-counts');
             const data = await response.json();
 
             if (response.ok) {
@@ -140,7 +141,23 @@ function Community(){
                 setPopularAudioStates(initialStates);
             } else {
                 console.error('Failed to fetch popular samples:', data.error);
-                toast.error('Failed to load popular samples');
+                const fallbackResponse = await fetch('http://localhost:5000/api/community/popular-samples');
+                const fallbackData = await fallbackResponse.json();
+                if (fallbackResponse.ok) {
+                    setPopularSamples(fallbackData.samples || []);
+                    const initialStates = {};
+                    fallbackData.samples?.forEach((_, index) => {
+                        initialStates[index] = {
+                            isPlaying: false,
+                            duration: '00:00',
+                            currentTime: '00:00',
+                            isLoaded: false
+                        };
+                    });
+                    setPopularAudioStates(initialStates);
+                } else {
+                    toast.error('Failed to load popular samples');
+                }
             }
         } catch (error) {
             console.error('Error fetching popular samples:', error);
@@ -153,7 +170,7 @@ function Community(){
     const fetchAllSamples = async () => {
         setLoadingSamples(true);
         try {
-            const response = await fetch('http://localhost:5000/api/community/samples-with-users');
+            const response = await fetch('http://localhost:5000/api/community/samples-with-users-and-counts');
             const data = await response.json();
 
             if (response.ok) {
@@ -170,7 +187,23 @@ function Community(){
                 setAudioStates(initialStates);
             } else {
                 console.error('Failed to fetch samples:', data.error);
-                toast.error('Failed to load samples');
+                const fallbackResponse = await fetch('http://localhost:5000/api/community/samples-with-users');
+                const fallbackData = await fallbackResponse.json();
+                if (fallbackResponse.ok) {
+                    setAllSamples(fallbackData.samples || []);
+                    const initialStates = {};
+                    fallbackData.samples?.forEach((_, index) => {
+                        initialStates[index] = {
+                            isPlaying: false,
+                            duration: '00:00',
+                            currentTime: '00:00',
+                            isLoaded: false
+                        };
+                    });
+                    setAudioStates(initialStates);
+                } else {
+                    toast.error('Failed to load samples');
+                }
             }
         } catch (error) {
             console.error('Error fetching samples:', error);
@@ -254,6 +287,10 @@ function Community(){
             console.error('Error toggling like:', error);
             toast.error('Failed to update like');
         }
+    };
+
+    const handleCommentClick = (sample, section = 'posts') => {
+        navigate('/comment-sample', { state: { sample } });
     };
 
     const formatTime = (seconds) => {
@@ -731,10 +768,14 @@ function Community(){
                                                     />
                                                     <p>{sample.likes_count}</p>
                                                 </div>
-                                                <Link to='/comment-sample' className='wave-icon'>
+                                                <div 
+                                                    className='wave-icon'
+                                                    onClick={() => handleCommentClick(sample, 'posts')}
+                                                    style={{ cursor: 'pointer' }}
+                                                >
                                                     <MessageSquare size={28} strokeWidth={1} color='#fff'/>
-                                                    <p>0</p>
-                                                </Link>
+                                                    <p>{sample.comments_count || 0}</p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

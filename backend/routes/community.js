@@ -373,7 +373,6 @@ router.put('/samples/:id/save', async (req, res) => {
   }
 });
 
-
 router.post('/samples/:id/like', async (req, res) => {
   try {
     const { id } = req.params;
@@ -681,6 +680,187 @@ router.get('/samples-with-users', async (req, res) => {
     res.json({ samples: samplesWithUsers });
   } catch (error) {
     console.error('Fetch samples with users error:', error);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
+    });
+  }
+});
+
+router.get('/comments/:sample_id', async (req, res) => {
+  try {
+    const { sample_id } = req.params;
+
+    const { data: comments, error } = await supabase
+      .from('comments')
+      .select('*')
+      .eq('sample_id', sample_id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      return res.status(500).json({ 
+        error: 'Failed to fetch comments',
+        details: error.message 
+      });
+    }
+
+    const commentsWithUsers = await Promise.all(
+      comments.map(async (comment) => {
+        try {
+          const { data: { user }, error: userError } = await supabaseAdmin.auth.admin.getUserById(comment.user_id);
+          
+          return {
+            ...comment,
+            user: {
+              id: user?.id || comment.user_id,
+              username: user?.user_metadata?.username || user?.email?.split('@')[0] || 'Unknown User',
+              profile_picture: user?.user_metadata?.profile_picture || null,
+              email: user?.email || null
+            }
+          };
+        } catch (userError) {
+          console.warn(`Failed to fetch user data for user_id: ${comment.user_id}`, userError);
+          return {
+            ...comment,
+            user: {
+              id: comment.user_id,
+              username: 'Unknown User',
+              profile_picture: null,
+              email: null
+            }
+          };
+        }
+      })
+    );
+
+    res.json({ comments: commentsWithUsers });
+  } catch (error) {
+    console.error('Fetch comments error:', error);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
+    });
+  }
+});
+
+router.post('/comments', async (req, res) => {
+  try {
+    const { user_id, sample_id, comment } = req.body;
+
+    if (!user_id || !sample_id || !comment) {
+      return res.status(400).json({ 
+        error: 'Missing required fields: user_id, sample_id, and comment' 
+      });
+    }
+
+    const { data: commentData, error: insertError } = await supabaseAdmin
+      .from('comments')
+      .insert([
+        {
+          user_id,
+          sample_id,
+          comment: comment.trim()
+        }
+      ])
+      .select()
+      .single();
+
+    if (insertError) {
+      console.error('Database insert error:', insertError);
+      return res.status(500).json({ 
+        error: 'Failed to post comment',
+        details: insertError.message 
+      });
+    }
+
+    const { data: commentsCount, error: countError } = await supabase
+      .from('comments')
+      .select('id', { count: 'exact' })
+      .eq('sample_id', sample_id);
+
+    if (!countError) {
+      const newCommentsCount = commentsCount.length;
+      await supabaseAdmin
+        .from('samples')
+        .update({ comments_count: newCommentsCount })
+        .eq('id', sample_id);
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Comment posted successfully!',
+      comment: commentData
+    });
+
+  } catch (error) {
+    console.error('Post comment error:', error);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
+    });
+  }
+});
+
+router.delete('/comments/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { user_id } = req.body;
+
+    if (!user_id) {
+      return res.status(400).json({ 
+        error: 'User ID is required for deletion' 
+      });
+    }
+
+    const { data: comment, error: fetchError } = await supabase
+      .from('comments')
+      .select('*')
+      .eq('id', id)
+      .eq('user_id', user_id)
+      .single();
+
+    if (fetchError || !comment) {
+      return res.status(404).json({ 
+        error: 'Comment not found or you do not have permission to delete it' 
+      });
+    }
+
+    const sample_id = comment.sample_id;
+
+    const { error: deleteError } = await supabaseAdmin
+      .from('comments')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', user_id);
+
+    if (deleteError) {
+      console.error('Database delete error:', deleteError);
+      return res.status(500).json({ 
+        error: 'Failed to delete comment',
+        details: deleteError.message 
+      });
+    }
+
+    const { data: commentsCount, error: countError } = await supabase
+      .from('comments')
+      .select('id', { count: 'exact' })
+      .eq('sample_id', sample_id);
+
+    if (!countError) {
+      const newCommentsCount = commentsCount.length;
+      await supabaseAdmin
+        .from('samples')
+        .update({ comments_count: newCommentsCount })
+        .eq('id', sample_id);
+    }
+
+    res.json({
+      success: true,
+      message: 'Comment deleted successfully!'
+    });
+
+  } catch (error) {
+    console.error('Delete comment error:', error);
     res.status(500).json({ 
       error: 'Internal server error',
       details: error.message 
