@@ -124,7 +124,7 @@ function Community(){
     const fetchPopularSamples = async () => {
         setLoadingPopular(true);
         try {
-            const response = await fetch('http://localhost:5000/api/community/popular-samples-with-counts');
+            const response = await fetch('http://localhost:5000/api/community/popular-samples');
             const data = await response.json();
 
             if (response.ok) {
@@ -141,23 +141,7 @@ function Community(){
                 setPopularAudioStates(initialStates);
             } else {
                 console.error('Failed to fetch popular samples:', data.error);
-                const fallbackResponse = await fetch('http://localhost:5000/api/community/popular-samples');
-                const fallbackData = await fallbackResponse.json();
-                if (fallbackResponse.ok) {
-                    setPopularSamples(fallbackData.samples || []);
-                    const initialStates = {};
-                    fallbackData.samples?.forEach((_, index) => {
-                        initialStates[index] = {
-                            isPlaying: false,
-                            duration: '00:00',
-                            currentTime: '00:00',
-                            isLoaded: false
-                        };
-                    });
-                    setPopularAudioStates(initialStates);
-                } else {
-                    toast.error('Failed to load popular samples');
-                }
+                toast.error('Failed to load popular samples');
             }
         } catch (error) {
             console.error('Error fetching popular samples:', error);
@@ -170,7 +154,7 @@ function Community(){
     const fetchAllSamples = async () => {
         setLoadingSamples(true);
         try {
-            const response = await fetch('http://localhost:5000/api/community/samples-with-users-and-counts');
+            const response = await fetch('http://localhost:5000/api/community/samples-with-users');
             const data = await response.json();
 
             if (response.ok) {
@@ -187,23 +171,7 @@ function Community(){
                 setAudioStates(initialStates);
             } else {
                 console.error('Failed to fetch samples:', data.error);
-                const fallbackResponse = await fetch('http://localhost:5000/api/community/samples-with-users');
-                const fallbackData = await fallbackResponse.json();
-                if (fallbackResponse.ok) {
-                    setAllSamples(fallbackData.samples || []);
-                    const initialStates = {};
-                    fallbackData.samples?.forEach((_, index) => {
-                        initialStates[index] = {
-                            isPlaying: false,
-                            duration: '00:00',
-                            currentTime: '00:00',
-                            isLoaded: false
-                        };
-                    });
-                    setAudioStates(initialStates);
-                } else {
-                    toast.error('Failed to load samples');
-                }
+                toast.error('Failed to load samples');
             }
         } catch (error) {
             console.error('Error fetching samples:', error);
