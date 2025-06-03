@@ -94,14 +94,94 @@ function Profile() {
         isDisconnecting: false
     });
 
-    useEffect(() => {
-        if (user) {
-            setUserName(user.user_metadata?.username || user.email?.split('@')[0] || 'User');
-            setUserEmail(user.email || '');
-            setNewUserName(user.user_metadata?.username || user.email?.split('@')[0] || 'User');
-            setProfilePicture(user.user_metadata?.profile_picture || '');
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: { 
+            opacity: 1,
+            transition: { 
+                duration: 0.6,
+                ease: "easeOut",
+                staggerChildren: 0.1
+            }
         }
-    }, [user]);
+    };
+
+    const titleVariants = {
+        hidden: { opacity: 0, y: -30 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: { 
+                duration: 0.8,
+                ease: "easeOut"
+            }
+        }
+    };
+
+    const leftSectionVariants = {
+        hidden: { opacity: 0, x: -50 },
+        visible: { 
+            opacity: 1, 
+            x: 0,
+            transition: { 
+                duration: 0.8,
+                ease: "easeOut",
+                delay: 0.2
+            }
+        }
+    };
+
+    const rightSectionVariants = {
+        hidden: { opacity: 0, x: 50 },
+        visible: { 
+            opacity: 1, 
+            x: 0,
+            transition: { 
+                duration: 0.8,
+                ease: "easeOut",
+                delay: 0.3
+            }
+        }
+    };
+
+    const profileFieldVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: (index) => ({
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: 0.6,
+                ease: "easeOut",
+                delay: 0.4 + (index * 0.1)
+            }
+        })
+    };
+
+    const profilePictureVariants = {
+        hidden: { opacity: 0, scale: 0.8 },
+        visible: { 
+            opacity: 1, 
+            scale: 1,
+            transition: { 
+                duration: 0.8,
+                ease: "easeOut",
+                delay: 0.5
+            }
+        }
+    };
+
+    const actionButtonsVariants = {
+        hidden: { opacity: 0, y: 30 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: { 
+                duration: 0.8,
+                ease: "easeOut",
+                delay: 0.6
+            }
+        }
+    };
 
     const passwordAnimationVariants = {
         hidden: { 
@@ -153,6 +233,15 @@ function Profile() {
             transition: { duration: 0.3 }
         }
     };
+
+    useEffect(() => {
+        if (user) {
+            setUserName(user.user_metadata?.username || user.email?.split('@')[0] || 'User');
+            setUserEmail(user.email || '');
+            setNewUserName(user.user_metadata?.username || user.email?.split('@')[0] || 'User');
+            setProfilePicture(user.user_metadata?.profile_picture || '');
+        }
+    }, [user]);
 
     const handleNameEdit = () => {
         setIsEditingName(true);
@@ -427,12 +516,34 @@ function Profile() {
         <>
             <Nav />
             <AnimatedBackground />
-            <div className='profile-container'>
-                <h1>Hi, {userName}</h1>
+            <motion.div 
+                className='profile-container'
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+            >
+                <motion.h1
+                    variants={titleVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    Hi, {userName}
+                </motion.h1>
                 <div className='profile-wrapper'>
-                    <div className='edit-profile'>
+                    <motion.div 
+                        className='edit-profile'
+                        variants={leftSectionVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
                         <div className='edit-name-profile'>
-                            <div className='edit'>
+                            <motion.div 
+                                className='edit'
+                                variants={profileFieldVariants}
+                                initial="hidden"
+                                animate="visible"
+                                custom={0}
+                            >
                                 <p>Username</p>
                                 <div className='edit-update'>
                                     {isEditingName ? (
@@ -470,20 +581,32 @@ function Profile() {
                                         </>
                                     )}
                                 </div>
-                            </div>
-                            <div className='edit'>
+                            </motion.div>
+                            <motion.div 
+                                className='edit'
+                                variants={profileFieldVariants}
+                                initial="hidden"
+                                animate="visible"
+                                custom={1}
+                            >
                                 <p>Email</p>
                                 <div className='edit-update-mail'>
                                     <p>{userEmail}</p>
                                 </div>
-                            </div>
+                            </motion.div>
                         </div>
                         
-                        <div className='change-password-button'>
+                        <motion.div 
+                            className='change-password-button'
+                            variants={profileFieldVariants}
+                            initial="hidden"
+                            animate="visible"
+                            custom={2}
+                        >
                             <button onClick={handleChangePasswordClick}>
                                <p>{showChangePassword ? 'Close' : 'Change Password'}</p>
                             </button>
-                        </div>
+                        </motion.div>
                         
                         <AnimatePresence>
                             {showChangePassword && (
@@ -540,10 +663,20 @@ function Profile() {
                                 </motion.form>
                             )}
                         </AnimatePresence>
-                    </div>
+                    </motion.div>
 
-                    <div className='right-profile'>
-                        <div className='change-image'>
+                    <motion.div 
+                        className='right-profile'
+                        variants={rightSectionVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
+                        <motion.div 
+                            className='change-image'
+                            variants={profilePictureVariants}
+                            initial="hidden"
+                            animate="visible"
+                        >
                             <div 
                                 className='profile-pic'
                                 style={{
@@ -576,8 +709,13 @@ function Profile() {
                                     <p>{isUploadingImage ? 'Uploading...' : 'Upload new image'}</p>
                                 </button>
                             </div>
-                        </div>
-                        <div className='disconnect-save'>
+                        </motion.div>
+                        <motion.div 
+                            className='disconnect-save'
+                            variants={actionButtonsVariants}
+                            initial="hidden"
+                            animate="visible"
+                        >
                             <div className='disconnect'>
                                 <button onClick={openDisconnectModal}>
                                     <X size={40} strokeWidth={1} color='#CF0000' />
@@ -594,10 +732,10 @@ function Profile() {
                                     <p>Save</p>
                                 </button>
                             </div>
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Disconnect Confirmation Modal */}
             <DisconnectConfirmationModal

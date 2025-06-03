@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import WaveSurfer from 'wavesurfer.js';
 import AnimatedBackground from "../components/background/AnimatedBackground";
 import { CircleUser, Heart, ArrowDownToLine, Play, Pause, Lock, LogIn } from 'lucide-react';
@@ -18,6 +19,93 @@ function LikedSamples() {
     
     const waveformRefs = useRef({});
     const waveSurferInstances = useRef({});
+
+    // Animation variants
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: { 
+            opacity: 1,
+            transition: { 
+                duration: 0.6,
+                ease: "easeOut",
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const titleVariants = {
+        hidden: { opacity: 0, y: -30 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: { 
+                duration: 0.8,
+                ease: "easeOut"
+            }
+        }
+    };
+
+    const backButtonVariants = {
+        hidden: { opacity: 0, x: -30 },
+        visible: { 
+            opacity: 1, 
+            x: 0,
+            transition: { 
+                duration: 0.6,
+                ease: "easeOut"
+            }
+        }
+    };
+
+    const contentVariants = {
+        hidden: { opacity: 0, y: 30 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: { 
+                duration: 0.8,
+                ease: "easeOut",
+                delay: 0.2
+            }
+        }
+    };
+
+    const sampleVariants = {
+        hidden: { opacity: 0, y: 40, scale: 0.95 },
+        visible: (index) => ({
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            transition: {
+                duration: 0.6,
+                ease: "easeOut",
+                delay: index * 0.1
+            }
+        })
+    };
+
+    const authOverlayVariants = {
+        hidden: { opacity: 0, scale: 0.9 },
+        visible: { 
+            opacity: 1, 
+            scale: 1,
+            transition: { 
+                duration: 0.8,
+                ease: "easeOut"
+            }
+        }
+    };
+
+    const loadingVariants = {
+        hidden: { opacity: 0 },
+        visible: { 
+            opacity: 1,
+            transition: { 
+                duration: 0.5,
+                ease: "easeOut"
+            }
+        }
+    };
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -423,16 +511,31 @@ function LikedSamples() {
         return (
             <>
                 <AnimatedBackground/>
-                <div className="saved-samples-container">
-                    <div className="back">
+                <motion.div 
+                    className="saved-samples-container"
+                    variants={loadingVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    <motion.div 
+                        className="back"
+                        variants={backButtonVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
                         <button disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
                             <p>Loading...</p>
                         </button>
-                    </div>
-                    <div className='savings'>
+                    </motion.div>
+                    <motion.div 
+                        className='savings'
+                        variants={titleVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
                         <h1>Liked Samples</h1>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             </>
         );
     }
@@ -441,8 +544,18 @@ function LikedSamples() {
         return (
             <>
                 <AnimatedBackground/>
-                <div className="saved-samples-container">
-                    <div className='auth-required-overlay'>
+                <motion.div 
+                    className="saved-samples-container"
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    <motion.div 
+                        className='auth-required-overlay'
+                        variants={authOverlayVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
                         <div className='auth-required-content'>
                             <Lock size={80} strokeWidth={1} color='#fff' />
                             <h1>Log in to view liked samples.</h1>
@@ -457,15 +570,30 @@ function LikedSamples() {
                                 </button>
                             </div>
                         </div>
-                    </div>
-                    <div className="back">
+                    </motion.div>
+                    <motion.div 
+                        className="back"
+                        variants={backButtonVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
                         <button disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
                             <p>Go Back</p>
                         </button>
-                    </div>
-                    <div className='savings'>
+                    </motion.div>
+                    <motion.div 
+                        className='savings'
+                        variants={titleVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
                         <h1>Liked Samples</h1>
-                        <div className='saved-samples-wrapper'>
+                        <motion.div 
+                            className='saved-samples-wrapper'
+                            variants={contentVariants}
+                            initial="hidden"
+                            animate="visible"
+                        >
                             <div className='saved-sample'>
                                 <h3>Rainy melody with harmonic violins</h3>
                                 <div className='audios-saved-sample'>
@@ -507,9 +635,9 @@ function LikedSamples() {
                                 </div>
                                 <div className='white-line' style={{ opacity: 0.5 }}></div>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                        </motion.div>
+                    </motion.div>
+                </motion.div>
             </>
         );
     }
@@ -517,25 +645,62 @@ function LikedSamples() {
     return (
         <>
             <AnimatedBackground/>
-            <div className="saved-samples-container">
-                <div className="back">
+            <motion.div 
+                className="saved-samples-container"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+            >
+                <motion.div 
+                    className="back"
+                    variants={backButtonVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
                     <button onClick={handleGoBack}> <p>Go Back</p></button>
-                </div>
-                <div className='savings'>
+                </motion.div>
+                <motion.div 
+                    className='savings'
+                    variants={titleVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
                     <h1>Liked Samples</h1>
-                    <div className='saved-samples-wrapper'>
+                    <motion.div 
+                        className='saved-samples-wrapper'
+                        variants={contentVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
                         {loadingSamples ? (
-                            <div className="loading-message">
+                            <motion.div 
+                                className="loading-message"
+                                variants={loadingVariants}
+                                initial="hidden"
+                                animate="visible"
+                            >
                                 <p>Loading your liked samples...</p>
-                            </div>
+                            </motion.div>
                         ) : likedSamples.length === 0 ? (
-                            <div className="no-content-message">
+                            <motion.div 
+                                className="no-content-message"
+                                variants={contentVariants}
+                                initial="hidden"
+                                animate="visible"
+                            >
                                 <p>You haven't liked any samples yet.</p>
                                 <p>Go to the community page to discover and like some amazing samples!</p>
-                            </div>
+                            </motion.div>
                         ) : (
                             likedSamples.map((sample, index) => (
-                                <div key={sample.id} className='saved-sample'>
+                                <motion.div 
+                                    key={sample.id} 
+                                    className='saved-sample'
+                                    variants={sampleVariants}
+                                    initial="hidden"
+                                    animate="visible"
+                                    custom={index}
+                                >
                                     <h3>{sample.title}</h3>
                                     <div className='audios-saved-sample'>
                                         <div className='audio-saved-sample'>
@@ -634,18 +799,12 @@ function LikedSamples() {
                                         </div>
                                     </div>
                                     <div className='white-line'></div>
-                                </div>
+                                </motion.div>
                             ))
                         )}
-                    </div>
-                </div>
-            </div>
-            <style>{`
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-            `}</style>
+                    </motion.div>
+                </motion.div>
+            </motion.div>
         </>
     );
 }

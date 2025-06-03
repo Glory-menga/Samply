@@ -31,6 +31,44 @@ function Generate(){
         "acoustic folk progression with warm tones"
     ];
 
+    const titleVariants = {
+        hidden: { opacity: 0, y: -30 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: { 
+                duration: 0.8,
+                ease: "easeOut"
+            }
+        }
+    };
+
+    const descriptionVariants = {
+        hidden: { opacity: 0, y: -20 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: { 
+                duration: 0.8,
+                ease: "easeOut",
+                delay: 0.2
+            }
+        }
+    };
+
+    const inputVariants = {
+        hidden: { opacity: 0, y: 30 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: { 
+                duration: 0.8,
+                ease: "easeOut",
+                delay: 0.4
+            }
+        }
+    };
+
     useEffect(() => {
         const checkAuth = async () => {
             try {
@@ -196,6 +234,13 @@ function Generate(){
         }
     };
 
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault(); 
+            handleGenerate();
+        }
+    };
+
     const handleLogin = () => {
         navigate('/login');
     };
@@ -345,8 +390,20 @@ function Generate(){
             <div className='container-generate'>
                 <div className='prompt-generate'>
                     <div className='intro-generate'>
-                        <h1>Generate a Sample</h1>
-                        <p>Enter a prompt describing the type of melody you want, including mood, style, and tempo (e.g., 'uplifting jazzy melody with a fast tempo').</p>
+                        <motion.h1
+                            variants={titleVariants}
+                            initial="hidden"
+                            animate="visible"
+                        >
+                            Generate a Sample
+                        </motion.h1>
+                        <motion.p
+                            variants={descriptionVariants}
+                            initial="hidden"
+                            animate="visible"
+                        >
+                            Enter a prompt describing the type of melody you want, including mood, style, and tempo (e.g., 'uplifting jazzy melody with a fast tempo').
+                        </motion.p>
                     </div>
                     <AnimatePresence>
                         {showTips && (
@@ -409,12 +466,18 @@ function Generate(){
                         )}
                     </AnimatePresence>
                      
-                    <div className='prompt'>
+                    <motion.div 
+                        className='prompt'
+                        variants={inputVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
                         <div className='input-prompt'>
                             <input
                                 type="text"
                                 value={prompt}
                                 onChange={(e) => setPrompt(e.target.value)}
+                                onKeyPress={handleKeyPress}
                                 placeholder="Type something like 'dreamy piano melody with a slow tempo' or 'funky guitar riff with high energy'..."
                                 disabled={isGenerating}
                             />
@@ -437,7 +500,7 @@ function Generate(){
                                 <ChevronRight size={28} strokeWidth={1} />
                             </button>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
                 <div className='help-generate'>
                     <motion.div 

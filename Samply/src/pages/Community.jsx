@@ -1,14 +1,171 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import WaveSurfer from 'wavesurfer.js';
 import AnimatedBackground from '../components/background/AnimatedBackground';
 import Nav from '../components/Nav';
-import { Heart, ArrowDownToLine, Play, Pause, Share2, CircleUser, MessageSquare } from 'lucide-react';
+import { Heart, ArrowDownToLine, Play, Pause, Share2, CircleUser, MessageSquare, X, Copy, Check } from 'lucide-react';
 import LikedSamplesTab from '../components/tabs/LikedSamplesTab';
 import { supabase } from '../supabaseClient';
 import { toast } from 'react-toastify';
 import '../css/Community.css';
+
+import {
+  FacebookShareButton,
+  TwitterShareButton,
+  LinkedinShareButton,
+  RedditShareButton,
+  WhatsappShareButton,
+  FacebookIcon,
+  TwitterIcon,
+  LinkedinIcon,
+  RedditIcon,
+  WhatsappIcon,
+} from 'react-share';
+
+const ShareModal = ({ isOpen, sample, onClose }) => {
+    const [copied, setCopied] = useState(false);
+    
+    if (!isOpen || !sample) return null;
+
+    const shareUrl = `${window.location.origin}/community`;
+    const shareTitle = `Check out this amazing sample: ${sample.title}`;
+    const shareDescription = `Listen to "${sample.title}" by ${sample.user?.username || 'Unknown User'} - Created with AI music generation`;
+
+    const handleCopyLink = async () => {
+        try {
+            await navigator.clipboard.writeText(shareUrl);
+            setCopied(true);
+            toast.success('Community link copied to clipboard!');
+            setTimeout(() => setCopied(false), 2000);
+        } catch (error) {
+            console.error('Failed to copy link:', error);
+            toast.error('Failed to copy link');
+        }
+    };
+
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <motion.div 
+                    className="share-modal-overlay"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    onClick={onClose}
+                >
+                    <motion.div 
+                        className="share-modal-content"
+                        initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                        transition={{ duration: 0.3, type: "spring", damping: 20 }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="share-modal-header">
+                            <h2>Share Sample</h2>
+                            <button className="share-close-btn" onClick={onClose}>
+                                <X size={24} color="#fff" />
+                            </button>
+                        </div>
+                        
+                        <div className="share-modal-body">
+                            <div className="sample-preview">
+                                <h3>"{sample.title}"</h3>
+                                <p>by {sample.user?.username || 'Unknown User'}</p>
+                                <p>Share this amazing sample with others</p>
+                            </div>
+
+                            <div className="share-platforms">
+                                <h4>Share on social platforms</h4>
+                                <div className="social-buttons">
+                                    <FacebookShareButton
+                                        url={shareUrl}
+                                        quote={shareTitle}
+                                        hashtag="#AIMusic"
+                                        className="social-share-button"
+                                    >
+                                        <FacebookIcon size={48} round />
+                                        <p>Facebook</p>
+                                    </FacebookShareButton>
+
+                                    <TwitterShareButton
+                                        url={shareUrl}
+                                        title={shareTitle}
+                                        hashtags={['AIMusic', 'MusicGeneration', 'Sample']}
+                                        className="social-share-button"
+                                    >
+                                        <TwitterIcon size={48} round />
+                                        <p>Twitter</p>
+                                    </TwitterShareButton>
+
+                                    <LinkedinShareButton
+                                        url={shareUrl}
+                                        title={shareTitle}
+                                        summary={shareDescription}
+                                        source="AI Music Generator"
+                                        className="social-share-button"
+                                    >
+                                        <LinkedinIcon size={48} round />
+                                        <p>LinkedIn</p>
+                                    </LinkedinShareButton>
+
+                                    <RedditShareButton
+                                        url={shareUrl}
+                                        title={shareTitle}
+                                        className="social-share-button"
+                                    >
+                                        <RedditIcon size={48} round />
+                                        <p>Reddit</p>
+                                    </RedditShareButton>
+
+                                    <WhatsappShareButton
+                                        url={shareUrl}
+                                        title={shareTitle}
+                                        separator=" - "
+                                        className="social-share-button"
+                                    >
+                                        <WhatsappIcon size={48} round />
+                                        <p>WhatsApp</p>
+                                    </WhatsappShareButton>
+                                </div>
+                            </div>
+
+                            <div className="share-link-section">
+                                <h4>Or copy community link</h4>
+                                <div className="copy-link-container">
+                                    <input 
+                                        type="text" 
+                                        value={shareUrl} 
+                                        readOnly 
+                                        className="share-link-input"
+                                    />
+                                    <button 
+                                        className="copy-link-btn"
+                                        onClick={handleCopyLink}
+                                    >
+                                        {copied ? (
+                                            <>
+                                                <Check size={20} />
+                                                <span>Copied!</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Copy size={20} />
+                                                <span>Copy</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    );
+};
 
 function Community(){
     const navigate = useNavigate();
@@ -29,6 +186,10 @@ function Community(){
     const [popularAudioStates, setPopularAudioStates] = useState({});
     const [likedSamples, setLikedSamples] = useState(new Set());
     const [popularLikedSamples, setPopularLikedSamples] = useState(new Set());
+    const [shareModal, setShareModal] = useState({
+        isOpen: false,
+        sample: null
+    });
 
     const titleVariants = {
         hidden: { opacity: 0, y: -30 },
@@ -259,6 +420,20 @@ function Community(){
 
     const handleCommentClick = (sample, section = 'posts') => {
         navigate('/comment-sample', { state: { sample } });
+    };
+
+    const openShareModal = (sample) => {
+        setShareModal({
+            isOpen: true,
+            sample: sample
+        });
+    };
+
+    const closeShareModal = () => {
+        setShareModal({
+            isOpen: false,
+            sample: null
+        });
     };
 
     const formatTime = (seconds) => {
@@ -690,7 +865,7 @@ function Community(){
                                                     <ArrowDownToLine size={28} strokeWidth={1} color='#fff'/>
                                                     <p>Download</p>
                                                 </div>
-                                                <div className='post-icon'>
+                                                <div className='post-icon' onClick={() => openShareModal(sample)}>
                                                     <Share2 size={28} strokeWidth={1} color='#fff'/>
                                                     <p>Share</p>
                                                 </div>
@@ -756,6 +931,13 @@ function Community(){
                     </div>
                 </motion.div>
             </div>
+
+            {/* Share Modal */}
+            <ShareModal
+                isOpen={shareModal.isOpen}
+                sample={shareModal.sample}
+                onClose={closeShareModal}
+            />
         </>
     );
 }
