@@ -648,12 +648,6 @@ function Samples(){
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className='share'>
-                                            <button>
-                                                <Share2 size={30} strokeWidth={1} color='#fff'/>
-                                                <p>Share</p>
-                                            </button>
-                                        </div>
                                     </div>
                                 </div>
                                 <div className='sample-date'>

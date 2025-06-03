@@ -157,47 +157,6 @@
  font-size: 12px;
 }
 
-.share button{
-  display: flex;
-  flex-direction: row;
-  border: none;
-  background: none;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.share button:hover{
-  scale: 1.1;
-}
-
-.share p{
-  position: relative;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #fff;
-  font-size: 18px;
-  overflow: hidden;
-}
-
-.share p::after{
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 0;
-  height: 1px;
-  background-color: #fff;
-  transition: width 0.3s ease, left 0.3s ease;
-}
-
-.share p:hover::after{
-  width: 100%;
-  left: 0;
-}
-
 /* Delete Modal Styles */
 .delete-modal-overlay {
   position: fixed;
@@ -354,3 +313,4 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+

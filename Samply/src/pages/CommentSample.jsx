@@ -509,7 +509,7 @@ function CommentSample(){
                                                     onClick={() => handleDeleteComment(comment.id)}
                                                     style={{ marginLeft: '10px' }}
                                                 >
-                                                    <X size={24} strokeWidth={1} color='#ff4444'/>
+                                                    <X size={38} strokeWidth={1} color='#ff4444'/>
                                                 </button>
                                             )}
                                         </div>
