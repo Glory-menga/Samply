@@ -11,19 +11,32 @@
 .popular-posts{
   display: flex;
   flex-direction: row;
-  margin-top: 20px;
+  margin-top: 40px;
   margin-right: 20px;
   overflow-x: auto;
-  padding-bottom: 10px;
-  scrollbar-width: none;
+  padding-bottom: 20px;
 }
 
 .popular-posts::-webkit-scrollbar {
-  display: none;
+  height: 4px;
+}
+
+.popular-posts::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.popular-posts::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  transition: background 0.3s ease;
+}
+
+.popular-posts::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .popular-posts {
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
 }
 
 .popular-post{
