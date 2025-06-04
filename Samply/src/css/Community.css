@@ -12,7 +12,20 @@
   display: flex;
   flex-direction: row;
   margin-top: 20px;
+  margin-right: 20px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scrollbar-width: none;
 }
+
+.popular-posts::-webkit-scrollbar {
+  display: none;
+}
+
+.popular-posts {
+  scrollbar-width: none;
+}
+
 .popular-post{
   display: flex;
   flex-direction: column;
@@ -21,10 +34,11 @@
   backdrop-filter: blur(10px);
   border-radius: 8px;
   height: 130px;
-  width: 340px;
-  padding: 10px;
+  width: 320px; 
   margin-right: 15px;
+  padding: 10px;
   transition: all 0.3s ease;
+  flex-shrink: 0; 
 }
 .popular-post:hover{
   transform: translateY(-2px);
@@ -74,7 +88,6 @@
   font-weight: 500;
 }
 .title-popular-post{
-  margin-top: 5px;
   font-size: 12px;
 }
 .audio-popular-post{
