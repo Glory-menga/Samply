@@ -7,9 +7,7 @@
   background-color: transparent;
   width: 100%;
 }
-.container-space{
-  overflow: hidden;
-}
+
 .heading-container {
   position: relative;
   display: flex;
@@ -18,14 +16,16 @@
   width: 100%;
   height: 400px;
   background-color: transparent;
+  margin-top: 30px;
 }
+
 .heading-container h1 {
   position: absolute;
   font-size: 100px;
   text-align: center;
   z-index: 1;
   width: 100%;
-  top: 30px;
+  top: 25px;
   font-weight: bold;
   background-color: transparent;
 }
@@ -41,4 +41,128 @@
   align-items: center;
   top: -3%;
   transform: translateY(-40%);
+}
+
+.bottom-text-home{
+  background-color: red;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  opacity: 0.3;
+}
+
+/* Loading Screen Styles */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  z-index: 1000;
+}
+
+.progress-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.progress-circle {
+  transform: rotate(-90deg);
+}
+
+.progress-circle-fill {
+  transition: stroke-dashoffset 0.3s ease;
+}
+
+.progress-text {
+  position: absolute;
+  font-family: 'manrope';
+  font-weight: 200;
+  font-size: 42px;
+  color: white;
+  text-align: center;
+}
+
+/* Intro Screen Styles */
+.intro-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.intro-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.intro-metaball {
+  width: 550px;
+  height: 550px;
+  display: flex;
+  
+}
+.intro-text {
+  position: absolute;
+  z-index: 10;
+  margin-bottom: 60px;
+  top: 43%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.intro-text p {
+  font-size: 24px;
+  line-height: 1.6;
+  color: white;
+  text-align: center;
+  width: 50%;
+  margin: 0;
+}
+
+.skip-intro-btn{
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  color: white;
+  border: none;
+  background: none;
+  font-size: 22px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.skip-intro-btn::after{
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background-color: #fff;
+  transition: 0.3s ease, left 0.3s ease;
+}
+
+.skip-intro-btn:hover::after{
+  width: 100%;
+  left: 0;
 }

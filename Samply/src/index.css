@@ -59,6 +59,7 @@ p{
 
 /* Space Homepage */
 .container-space {
+  overflow: hidden;
   z-index: 3;
   color: white;
   position: relative;
@@ -66,8 +67,7 @@ p{
   flex-direction: column;
   align-items: center;
   background-color: transparent;
-  height: calc(100dvh - 60px);
-  padding-top: 60px;
+  height: 100vh;
 }
 .container-space h1{
   background-color: transparent;
