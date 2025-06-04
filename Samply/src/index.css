@@ -338,3 +338,17 @@ p{
 .help-icons button:disabled:hover {
   scale: 1;
 }
+
+/*Phone Or Tablet*/
+.phone-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  height: 100vh;
+}
+.phone-container p{
+  text-align: center;
+  width: 70%;
+}

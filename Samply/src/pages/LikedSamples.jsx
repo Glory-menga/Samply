@@ -545,32 +545,32 @@ function LikedSamples() {
             <>
                 <AnimatedBackground/>
                 <motion.div 
+                    className='auth-required-overlay'
+                    variants={authOverlayVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    <div className='auth-required-content'>
+                        <Lock size={80} strokeWidth={1} color='#fff' />
+                        <h1>Log in to view liked samples.</h1>
+                        <p>You need to be logged in to access your liked samples. Please log in or create an account to view your saved collection.</p>
+                        <div className='auth-buttons'>
+                            <button className='btn-login' onClick={handleLogin}>
+                                <LogIn size={20} strokeWidth={1} />
+                                <span>Log In</span>
+                            </button>
+                            <button className='btn-signup' onClick={handleSignup}>
+                                <span>Sign Up</span>
+                            </button>
+                        </div>
+                    </div>
+                </motion.div>
+                <motion.div 
                     className="saved-samples-container"
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
                 >
-                    <motion.div 
-                        className='auth-required-overlay'
-                        variants={authOverlayVariants}
-                        initial="hidden"
-                        animate="visible"
-                    >
-                        <div className='auth-required-content'>
-                            <Lock size={80} strokeWidth={1} color='#fff' />
-                            <h1>Log in to view liked samples.</h1>
-                            <p>You need to be logged in to access your liked samples. Please log in or create an account to view your saved collection.</p>
-                            <div className='auth-buttons'>
-                                <button className='btn-login' onClick={handleLogin}>
-                                    <LogIn size={20} strokeWidth={1} />
-                                    <span>Log In</span>
-                                </button>
-                                <button className='btn-signup' onClick={handleSignup}>
-                                    <span>Sign Up</span>
-                                </button>
-                            </div>
-                        </div>
-                    </motion.div>
                     <motion.div 
                         className="back"
                         variants={backButtonVariants}

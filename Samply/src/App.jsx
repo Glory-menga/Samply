@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import Home from './pages/Home';
 import Generate from './pages/Generate';
 import SampleGenerated from './pages/SampleGenerated';
@@ -13,62 +14,178 @@ import Signup from './pages/Signup';
 import Profile from './pages/Profile';
 import LoadingPage from './components/LoadingPage';
 import NotFound from './pages/NotFound';
+import PhoneOrTablet from './pages/PhoneOrTablet';
 import RedirectIfLoggedIn from './components/RedirectIfLoggedIn';
 import { UserProvider } from './context/UserContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css'
 
+const ProtectedRoute = ({ children, isMobileOrTablet }) => {
+  if (isMobileOrTablet) {
+    return <Navigate to="/phone-or-tablet" replace />;
+  }
+  return children;
+};
+
 function App() {
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
+
+  useEffect(() => {
+    const detectDevice = () => {
+      const isSmallScreen = window.innerWidth <= 1024;
+      setIsMobileOrTablet(isSmallScreen);
+    };
+
+    detectDevice();
+
+    const handleResize = () => {
+      detectDevice();
+    };
+
+    window.addEventListener('resize', handleResize);
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <UserProvider>
-        <Router>
-          <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop
-            closeOnClick
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="dark"
-            toastClassName="custom-toast"
-            progressClassName="custom-progress"
+      <Router>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+          toastClassName="custom-toast"
+          progressClassName="custom-progress"
+        />
+        <Routes>
+          <Route path="/phone-or-tablet" element={<PhoneOrTablet />} />
+          <Route 
+            path="/" 
+            element={
+              <ProtectedRoute isMobileOrTablet={isMobileOrTablet}>
+                <Home />
+              </ProtectedRoute>
+            } 
           />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/generate" element={<Generate />} />
-            <Route path="/sample-generated" element={<SampleGenerated />} />
-            <Route path="/edit-sample" element={<EditSample />} />
-            <Route path="/samples" element={<Samples />} />
-            <Route path="/community" element={<Community />} />
-            <Route path="/comment-sample" element={<CommentSample />} />
-            <Route path="/saved-samples" element={<SavedSamples />} />
-            <Route path="/liked-samples" element={<LikedSamples />} />
-            <Route
-              path="/login"
-              element={
+          <Route 
+            path="/generate" 
+            element={
+              <ProtectedRoute isMobileOrTablet={isMobileOrTablet}>
+                <Generate />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/sample-generated" 
+            element={
+              <ProtectedRoute isMobileOrTablet={isMobileOrTablet}>
+                <SampleGenerated />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/edit-sample" 
+            element={
+              <ProtectedRoute isMobileOrTablet={isMobileOrTablet}>
+                <EditSample />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/samples" 
+            element={
+              <ProtectedRoute isMobileOrTablet={isMobileOrTablet}>
+                <Samples />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/community" 
+            element={
+              <ProtectedRoute isMobileOrTablet={isMobileOrTablet}>
+                <Community />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/comment-sample" 
+            element={
+              <ProtectedRoute isMobileOrTablet={isMobileOrTablet}>
+                <CommentSample />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/saved-samples" 
+            element={
+              <ProtectedRoute isMobileOrTablet={isMobileOrTablet}>
+                <SavedSamples />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/liked-samples" 
+            element={
+              <ProtectedRoute isMobileOrTablet={isMobileOrTablet}>
+                <LikedSamples />
+              </ProtectedRoute>
+            } 
+          />
+          <Route
+            path="/login"
+            element={
+              <ProtectedRoute isMobileOrTablet={isMobileOrTablet}>
                 <RedirectIfLoggedIn redirectTo="/">
                   <Login />
                 </RedirectIfLoggedIn>
-              }
-            />
-            <Route
-              path="/signup"
-              element={
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <ProtectedRoute isMobileOrTablet={isMobileOrTablet}>
                 <RedirectIfLoggedIn redirectTo="/">
                   <Signup />
                 </RedirectIfLoggedIn>
-              }
-            />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/loading-page" element={<LoadingPage />} />
-            {/*Error Page*/}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Router>
+              </ProtectedRoute>
+            }
+          />
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute isMobileOrTablet={isMobileOrTablet}>
+                <Profile />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/loading-page" 
+            element={
+              <ProtectedRoute isMobileOrTablet={isMobileOrTablet}>
+                <LoadingPage />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Error Page - also protected */}
+          <Route 
+            path="*" 
+            element={
+              <ProtectedRoute isMobileOrTablet={isMobileOrTablet}>
+                <NotFound />
+              </ProtectedRoute>
+            } 
+          />
+        </Routes>
+      </Router>
     </UserProvider>
   )
 }

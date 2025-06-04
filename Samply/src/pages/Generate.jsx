@@ -447,7 +447,7 @@ function Generate(){
                                         <p>3.</p>
                                     </div>
                                     <div className='tip-txt'>
-                                        <p><b>Listen & Refine</b> – Play your sample and tweak the prompt for different results.</p>
+                                        <p><b>Listen & edit</b> – Play your sample and edit the sample for different results.</p>
                                     </div>
                                 </motion.div>
                                 <motion.div 
