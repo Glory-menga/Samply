@@ -1,5 +1,6 @@
 import React from 'react';
 
+
 const AnimatedBackground = () => {
   return (
     <div className="gradient-bg">
