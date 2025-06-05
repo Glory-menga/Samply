@@ -868,4 +868,42 @@ router.delete('/comments/:id', async (req, res) => {
   }
 });
 
+router.get('/user-expiring-samples/:user_id', async (req, res) => {
+  try {
+    const { user_id } = req.params;
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const dayAfterTomorrow = new Date();
+    dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+
+    const { data: expiringSamples, error } = await supabase
+      .from('samples')
+      .select('id, title, expires_at, saved')
+      .eq('user_id', user_id)
+      .eq('saved', false) 
+      .gte('expires_at', tomorrow.toISOString().split('T')[0])
+      .lt('expires_at', dayAfterTomorrow.toISOString().split('T')[0]); 
+    if (error) {
+      console.error('Fetch expiring samples error:', error);
+      return res.status(500).json({ 
+        error: 'Failed to fetch expiring samples',
+        details: error.message 
+      });
+    }
+
+    res.json({ 
+      expiringSamples: expiringSamples || [],
+      count: expiringSamples ? expiringSamples.length : 0
+    });
+  } catch (error) {
+    console.error('Check expiring samples error:', error);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.message 
+    });
+  }
+});
+
 export default router;

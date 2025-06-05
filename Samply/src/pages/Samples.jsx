@@ -128,6 +128,36 @@ function Samples(){
     };
 
     useEffect(() => {
+        const checkForExpiringSamples = async () => {
+            if (!user) return;
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/community/user-expiring-samples/${user.id}`);
+                const data = await response.json();
+
+                if (response.ok && data.expiringSamples && data.expiringSamples.length > 0) {
+                    data.expiringSamples.forEach(sample => {
+                        toast.warning(`${sample.title} will be deleted if you don't save it`, {
+                            position: "top-right",
+                            autoClose: 8000, 
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                        });
+                    });
+                }
+            } catch (error) {
+                console.error('Error checking expiring samples:', error);
+            }
+        };
+
+        if (user && !loadingSamples) {
+            checkForExpiringSamples();
+        }
+    }, [user, loadingSamples]);
+
+    useEffect(() => {
         const checkAuth = async () => {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
@@ -386,7 +416,6 @@ function Samples(){
             if (response.ok) {
                 toast.success(`${sampleName} is saved!`);
                 
-                // Update the sample in local state
                 setSamples(prev => prev.map((sample, i) => 
                     i === index ? { ...sample, saved: result.saved } : sample
                 ));
