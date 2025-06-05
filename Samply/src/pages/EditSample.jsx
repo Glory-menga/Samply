@@ -161,7 +161,7 @@ function EditSample(){
         try {
             cleanup();
 
-            const proxyUrl = `http://localhost:5000/api/replicate/proxy-audio?url=${encodeURIComponent(sampleData.sample.audio)}`;
+            const proxyUrl = `https://samply-production.up.railway.app/api/replicate/proxy-audio?url=${encodeURIComponent(sampleData.sample.audio)}`;
             
             playerRef.current = new Tone.Player({
                 url: proxyUrl,

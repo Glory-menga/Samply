@@ -175,7 +175,7 @@ function SampleGenerated(){
                                 }
                             });
 
-                            const proxyUrl = `http://localhost:5000/api/replicate/proxy-audio?url=${encodeURIComponent(sample.audio)}`;
+                            const proxyUrl = `https://samply-production.up.railway.app/api/replicate/proxy-audio?url=${encodeURIComponent(sample.audio)}`;
                             
                             wavesurferRefs.current[index] = wavesurfer;
                             
@@ -349,7 +349,7 @@ function SampleGenerated(){
         if (!sample || !sample.audio) return;
 
         try {
-            const response = await fetch(`http://localhost:5000/api/replicate/proxy-audio?url=${encodeURIComponent(sample.audio)}`);
+            const response = await fetch(`https://samply-production.up.railway.app/api/replicate/proxy-audio?url=${encodeURIComponent(sample.audio)}`);
             const blob = await response.blob();
             
             const url = window.URL.createObjectURL(blob);
@@ -407,7 +407,7 @@ function SampleGenerated(){
                 return;
             }
 
-            const audioResponse = await fetch(`http://localhost:5000/api/replicate/proxy-audio?url=${encodeURIComponent(sample.audio)}`);
+            const audioResponse = await fetch(`https://samply-production.up.railway.app/api/replicate/proxy-audio?url=${encodeURIComponent(sample.audio)}`);
             const audioBlob = await audioResponse.blob();
             
             const reader = new FileReader();
@@ -421,7 +421,7 @@ function SampleGenerated(){
                     audio_data: base64Audio
                 };
 
-                const response = await fetch('http://localhost:5000/api/community/publish-sample', {
+                const response = await fetch('https://samply-production.up.railway.app/api/community/publish-sample', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

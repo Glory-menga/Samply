@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import WaveSurfer from 'wavesurfer.js';
+import ScrollToTopButton from '../components/ScrollToTopButton';
 import AnimatedBackground from "../components/background/AnimatedBackground";
 import { CircleUser, SaveOff, ArrowDownToLine, Play, Pause, Lock, LogIn } from 'lucide-react';
 import { supabase } from '../supabaseClient';
@@ -157,7 +158,7 @@ function SavedSamples() {
 
         setLoadingSamples(true);
         try {
-            const response = await fetch(`http://localhost:5000/api/community/user-saved-samples/${user.id}`);
+            const response = await fetch(`https://samply-production.up.railway.app/api/community/user-saved-samples/${user.id}`);
             const data = await response.json();
 
             if (response.ok) {
@@ -393,7 +394,7 @@ function SavedSamples() {
         setUnsaveModal(prev => ({ ...prev, isUnsaving: true }));
         
         try {
-            const response = await fetch(`http://localhost:5000/api/community/samples/${sampleId}/save`, {
+            const response = await fetch(`https://samply-production.up.railway.app/api/community/samples/${sampleId}/save`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -506,6 +507,7 @@ function SavedSamples() {
     return (
         <>
             <AnimatedBackground/>
+            <ScrollToTopButton />
             <div className="saved-samples-container">
                 <div className="back">
                     <button onClick={() => navigate(-1)}> <p>Go Back</p></button>

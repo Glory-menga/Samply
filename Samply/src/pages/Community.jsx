@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import WaveSurfer from 'wavesurfer.js';
 import AnimatedBackground from '../components/background/AnimatedBackground';
 import Nav from '../components/Nav';
+import ScrollToTopButton from '../components/ScrollToTopButton';
 import { Heart, ArrowDownToLine, Play, Pause, Share2, CircleUser, MessageSquare, X, Copy, Check } from 'lucide-react';
 import LikedSamplesTab from '../components/tabs/LikedSamplesTab';
 import { supabase } from '../supabaseClient';
@@ -263,7 +264,7 @@ function Community(){
         if (!user) return;
         
         try {
-            const response = await fetch(`http://localhost:5000/api/community/user-likes/${user.id}`);
+            const response = await fetch(`https://samply-production.up.railway.app/api/community/user-likes/${user.id}`);
             const data = await response.json();
             
             if (response.ok) {
@@ -285,7 +286,7 @@ function Community(){
     const fetchPopularSamples = async () => {
         setLoadingPopular(true);
         try {
-            const response = await fetch('http://localhost:5000/api/community/popular-samples');
+            const response = await fetch('https://samply-production.up.railway.app/api/community/popular-samples');
             const data = await response.json();
 
             if (response.ok) {
@@ -315,7 +316,7 @@ function Community(){
     const fetchAllSamples = async () => {
         setLoadingSamples(true);
         try {
-            const response = await fetch('http://localhost:5000/api/community/samples-with-users');
+            const response = await fetch('https://samply-production.up.railway.app/api/community/samples-with-users');
             const data = await response.json();
 
             if (response.ok) {
@@ -353,7 +354,7 @@ function Community(){
             : likedSamples.has(sampleId);
 
         try {
-            const response = await fetch(`http://localhost:5000/api/community/samples/${sampleId}/like`, {
+            const response = await fetch(`https://samply-production.up.railway.app/api/community/samples/${sampleId}/like`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -709,6 +710,7 @@ function Community(){
     return(
         <>
             <Nav />
+            <ScrollToTopButton />
             <AnimatedBackground />
             <div className='community-container'>
                 <LikedSamplesTab />

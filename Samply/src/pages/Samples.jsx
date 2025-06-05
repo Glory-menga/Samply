@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import WaveSurfer from 'wavesurfer.js';
 import Nav from '../components/Nav';
+import ScrollToTopButton from '../components/ScrollToTopButton';
 import SavedSamplesTab from '../components/tabs/SavedSamplesTab';
 import AnimatedBackground from '../components/background/AnimatedBackground';
 import { Save, ArrowDownToLine, Play, Pause, Share2, Lock, LogIn, X, Trash2 } from 'lucide-react';
@@ -132,7 +133,7 @@ function Samples(){
             if (!user) return;
 
             try {
-                const response = await fetch(`http://localhost:5000/api/community/user-expiring-samples/${user.id}`);
+                const response = await fetch(`https://samply-production.up.railway.app/api/community/user-expiring-samples/${user.id}`);
                 const data = await response.json();
 
                 if (response.ok && data.expiringSamples && data.expiringSamples.length > 0) {
@@ -190,7 +191,7 @@ function Samples(){
 
         setLoadingSamples(true);
         try {
-            const response = await fetch(`http://localhost:5000/api/community/user-samples/${user.id}`);
+            const response = await fetch(`https://samply-production.up.railway.app/api/community/user-samples/${user.id}`);
             const data = await response.json();
 
             if (response.ok) {
@@ -403,7 +404,7 @@ function Samples(){
         setSavingIndex(index);
         
         try {
-            const response = await fetch(`http://localhost:5000/api/community/samples/${sampleId}/save`, {
+            const response = await fetch(`https://samply-production.up.railway.app/api/community/samples/${sampleId}/save`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -458,7 +459,7 @@ function Samples(){
         setDeleteModal(prev => ({ ...prev, isDeleting: true }));
         
         try {
-            const response = await fetch(`http://localhost:5000/api/community/samples/${sampleId}`, {
+            const response = await fetch(`https://samply-production.up.railway.app/api/community/samples/${sampleId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -525,6 +526,7 @@ function Samples(){
         return (
             <>
                 <Nav />
+                <ScrollToTopButton />
                 <AnimatedBackground/>
                 <div className='sample-container'>
                     <SavedSamplesTab/>
@@ -538,6 +540,7 @@ function Samples(){
         return (
             <>
                 <Nav />
+                <ScrollToTopButton />
                 <AnimatedBackground/>
                 <div className='sample-container'>
                     <div className='auth-required-overlay'>
@@ -565,6 +568,7 @@ function Samples(){
     return(
         <>
             <Nav />
+            <ScrollToTopButton />
             <AnimatedBackground/>
             <div className='sample-container'>
                 <SavedSamplesTab/>

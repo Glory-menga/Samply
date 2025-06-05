@@ -106,7 +106,7 @@ function CommentSample(){
 
     const fetchComments = async (sampleId) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/community/comments/${sampleId}`);
+            const response = await fetch(`https://samply-production.up.railway.app/api/community/comments/${sampleId}`);
             const data = await response.json();
             
             if (response.ok) {
@@ -255,7 +255,7 @@ function CommentSample(){
         }
 
         try {
-            const response = await fetch('http://localhost:5000/api/community/comments', {
+            const response = await fetch('https://samply-production.up.railway.app/api/community/comments', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -289,7 +289,7 @@ function CommentSample(){
         }
 
         try {
-            const response = await fetch(`http://localhost:5000/api/community/comments/${commentId}`, {
+            const response = await fetch(`https://samply-production.up.railway.app/api/community/comments/${commentId}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

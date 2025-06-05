@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import WaveSurfer from 'wavesurfer.js';
+import ScrollToTopButton from '../components/ScrollToTopButton';
 import AnimatedBackground from "../components/background/AnimatedBackground";
 import { CircleUser, Heart, ArrowDownToLine, Play, Pause, Lock, LogIn } from 'lucide-react';
 import { supabase } from '../supabaseClient';
@@ -20,7 +21,6 @@ function LikedSamples() {
     const waveformRefs = useRef({});
     const waveSurferInstances = useRef({});
 
-    // Animation variants
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: { 
@@ -140,7 +140,7 @@ function LikedSamples() {
         
         setLoadingSamples(true);
         try {
-            const response = await fetch(`http://localhost:5000/api/community/user-liked-samples/${user.id}`);
+            const response = await fetch(`https://samply-production.up.railway.app/api/community/user-liked-samples/${user.id}`);
             
             if (!response.ok) {
                 const errorData = await response.json();
@@ -451,7 +451,7 @@ function LikedSamples() {
         if (!user) return;
 
         try {
-            const response = await fetch(`http://localhost:5000/api/community/samples/${sampleId}/like`, {
+            const response = await fetch(`https://samply-production.up.railway.app/api/community/samples/${sampleId}/like`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -511,6 +511,7 @@ function LikedSamples() {
         return (
             <>
                 <AnimatedBackground/>
+                <ScrollToTopButton />
                 <motion.div 
                     className="saved-samples-container"
                     variants={loadingVariants}
@@ -544,6 +545,7 @@ function LikedSamples() {
         return (
             <>
                 <AnimatedBackground/>
+                <ScrollToTopButton />
                 <motion.div 
                     className='auth-required-overlay'
                     variants={authOverlayVariants}
@@ -645,6 +647,7 @@ function LikedSamples() {
     return (
         <>
             <AnimatedBackground/>
+            <ScrollToTopButton />
             <motion.div 
                 className="saved-samples-container"
                 variants={containerVariants}
