@@ -16,7 +16,7 @@ const BlurredBubbleBackground = () => {
         opacity: Math.random() * 0.7 + 0.3, 
         speedX: (Math.random() - 0.5) * 0.5, 
         speedY: (Math.random() - 0.5) * 0.5,
-        color: Math.random() > 0.5 ? '#d0d0d0' : 'black',
+        color: Math.random() > 0.5 ? '#d0d0d0' : '000',
       });
     }
     setBubbles(initBubbles);
