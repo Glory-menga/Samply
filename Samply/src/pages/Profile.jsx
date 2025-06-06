@@ -94,6 +94,27 @@ function Profile() {
         isDisconnecting: false
     });
 
+    const checkUsernameAvailability = async (usernameToCheck) => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'https://samply-production.up.railway.app'}/api/community/check-username`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    username: usernameToCheck,
+                    exclude_user_id: user?.id 
+                })
+            });
+            
+            const data = await response.json();
+            return data.available;
+        } catch (error) {
+            console.error('Error checking username:', error);
+            return false;
+        }
+    };
+
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: { 
@@ -247,10 +268,21 @@ function Profile() {
         setIsEditingName(true);
     };
 
-    const handleNameSave = () => {
-        if (newUserName.trim() !== userName) {
-            setHasNameChanged(true);
+    const handleNameSave = async () => {
+        const trimmedUsername = newUserName.trim();
+        
+        if (trimmedUsername === userName) {
+            setIsEditingName(false);
+            return;
         }
+
+        const isUsernameAvailable = await checkUsernameAvailability(trimmedUsername);
+        if (!isUsernameAvailable) {
+            toast.error("Username already used");
+            return;
+        }
+
+        setHasNameChanged(true);
         setIsEditingName(false);
     };
 
@@ -424,6 +456,12 @@ function Profile() {
 
         try {
             if (hasNameChanged) {
+                const isUsernameAvailable = await checkUsernameAvailability(newUserName.trim());
+                if (!isUsernameAvailable) {
+                    toast.error("Username already used");
+                    return;
+                }
+
                 const { error: updateError } = await supabase.auth.updateUser({
                     data: { username: newUserName.trim() }
                 });

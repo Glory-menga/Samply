@@ -201,7 +201,7 @@ function Generate(){
         navigate('/loading-page');
         
         try {
-            const response = await fetch('https://samply-production.up.railway.app/replicate/generate', {
+            const response = await fetch('https://samply-production.up.railway.app/api/replicate/generate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

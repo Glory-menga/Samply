@@ -15,6 +15,24 @@ function Signup() {
     const [username, setUsername] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
+    const checkUsernameAvailability = async (usernameToCheck) => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'https://samply-production.up.railway.app'}/api/community/check-username`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username: usernameToCheck })
+            });
+            
+            const data = await response.json();
+            return data.available;
+        } catch (error) {
+            console.error('Error checking username:', error);
+            return false;
+        }
+    };
+
     const handleSignup = async () => {
         if (!email || !password || !username || !confirmPassword) {
             toast.error("All fields are required");
@@ -32,12 +50,18 @@ function Signup() {
             return;
         }
 
+        const isUsernameAvailable = await checkUsernameAvailability(username.trim());
+        if (!isUsernameAvailable) {
+            toast.error("Username already used");
+            return;
+        }
+
         try {
             const { data, error } = await supabase.auth.signUp({
                 email,
                 password,
                 options: {
-                    data: { username }
+                    data: { username: username.trim() }
                 }
             });
 
@@ -56,7 +80,6 @@ function Signup() {
             console.error("Signup error:", err);
         }
     };
-
 
     return (
         <>  

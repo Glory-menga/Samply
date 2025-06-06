@@ -906,4 +906,52 @@ router.get('/user-expiring-samples/:user_id', async (req, res) => {
   }
 });
 
+router.post('/check-username', async (req, res) => {
+  try {
+    const { username, exclude_user_id } = req.body;
+
+    if (!username || !username.trim()) {
+      return res.status(400).json({ 
+        error: 'Username is required',
+        available: false
+      });
+    }
+
+    const trimmedUsername = username.trim();
+
+    const { data: users, error } = await supabaseAdmin.auth.admin.listUsers();
+
+    if (error) {
+      console.error('Error fetching users:', error);
+      return res.status(500).json({ 
+        error: 'Failed to check username availability',
+        available: false,
+        details: error.message 
+      });
+    }
+
+    const usernameExists = users.users.some(user => {
+      if (exclude_user_id && user.id === exclude_user_id) {
+        return false;
+      }
+
+      const userUsername = user.user_metadata?.username;
+      return userUsername && userUsername.toLowerCase() === trimmedUsername.toLowerCase();
+    });
+
+    res.json({
+      available: !usernameExists,
+      message: usernameExists ? 'Username is already taken' : 'Username is available'
+    });
+
+  } catch (error) {
+    console.error('Check username error:', error);
+    res.status(500).json({ 
+      error: 'Internal server error',
+      available: false,
+      details: error.message 
+    });
+  }
+});
+
 export default router;
