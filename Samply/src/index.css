@@ -69,16 +69,6 @@ p{
   background-color: transparent;
   height: 100vh;
 }
-.container-space h1{
-  background-color: transparent;
-}
-.container-space p{
-  font-family: 'Altone';
-  font-size: 26px;
-  background-color: transparent;
-  position: absolute;
-  bottom: 6px;
-}
 
 /*Gradient Background*/
 :root {

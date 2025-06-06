@@ -4,23 +4,20 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: transparent;
   width: 100%;
 }
 
 .heading-container {
-  position: relative;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: space-around;
   align-items: center;
   width: 100%;
-  height: 400px;
+  height: 100vh;
   background-color: transparent;
-  margin-top: 30px;
 }
 
 .heading-container h1 {
-  position: absolute;
   font-size: 100px;
   text-align: center;
   z-index: 1;
@@ -31,26 +28,21 @@
 }
 
 .metaball{
-  position: absolute;
-  background-color: transparent;
-  width: 700px;
-  height: 700px;
+  width: 70vh;
+  height: 70vh;
   z-index: 2;
   display: flex;
   justify-content: center;
   align-items: center;
-  top: -3%;
-  transform: translateY(-40%);
+  background-color: transparent;
 }
 
 .bottom-text-home{
-  background-color: red;
   width: 100%;
   display: flex;
+  font-family: 'altone';
+  font-size: 30px;
   justify-content: center;
-  position: absolute;
-  bottom: 0;
-  left: 0;
   opacity: 0.3;
 }
 
@@ -115,8 +107,8 @@
 }
 
 .intro-metaball {
-  width: 550px;
-  height: 550px;
+  width: 70vh;
+  height: 70vh;
   display: flex;
   
 }

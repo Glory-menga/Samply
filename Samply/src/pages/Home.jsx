@@ -410,25 +410,25 @@ function Home() {
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
                     whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
+                    transition={{ duration: 0.5 }}
                   >
                     <Metaball 
                       analyser={analyser} 
                       isHovering={isHovering}
-                      sphereScale={isHovering ? 1.15 : 1.1}
+                      sphereScale={1.4}
                       animationSpeed={isHovering ? 1.8 : 1}
                     />
                   </motion.div>
+                  <motion.div 
+                    className='bottom-text-home'
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 0.3, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.5 }}
+                  >
+                    <p>Tap the ball to generate your sample!</p>
+                  </motion.div>
                 </div>
               </div>
-              <motion.div 
-                className='bottom-text-home'
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 0.3, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.5 }}
-              >
-                <p>Tap the ball to generate your sample!</p>
-              </motion.div>
             </div>
           </motion.div>
         )}
