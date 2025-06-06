@@ -11,6 +11,13 @@ const Sphere = ({ analyser = null, scale = 1, animationSpeed = 1, isHovering = f
   const time = useRef(0);
   const dataArray = useRef(null);
   const materialRef = useRef(null);
+  
+  const spinVelocity = useRef({
+    x: 0.2 + Math.random() * 0.3, 
+    y: 0.15 + Math.random() * 0.25,
+    z: 0.1 + Math.random() * 0.2
+  });
+  const totalRotation = useRef({ x: 0, y: 0, z: 0 });
 
   useFrame((_, delta) => {
     time.current += delta * animationSpeed; 
@@ -59,6 +66,27 @@ const Sphere = ({ analyser = null, scale = 1, animationSpeed = 1, isHovering = f
     
     position.needsUpdate = true;
     geometry.computeVertexNormals();
+
+    if (mesh) {
+      totalRotation.current.x += spinVelocity.current.x * delta * animationSpeed;
+      totalRotation.current.y += spinVelocity.current.y * delta * animationSpeed;
+      totalRotation.current.z += spinVelocity.current.z * delta * animationSpeed;
+      
+      const floatWobbleX = Math.sin(time.current * 0.3) * 0.1;
+      const floatWobbleY = Math.cos(time.current * 0.25) * 0.08;
+      const floatWobbleZ = Math.sin(time.current * 0.35) * 0.06;
+      
+      mesh.rotation.x = totalRotation.current.x + floatWobbleX;
+      mesh.rotation.y = totalRotation.current.y + floatWobbleY;
+      mesh.rotation.z = totalRotation.current.z + floatWobbleZ;
+      
+      mesh.position.y = Math.sin(time.current * 0.4) * 0.05;
+      mesh.position.x = Math.cos(time.current * 0.3) * 0.03;
+      
+      spinVelocity.current.x *= 0.9999;
+      spinVelocity.current.y *= 0.9999;
+      spinVelocity.current.z *= 0.9999;
+    }
 
     if (materialRef.current) {
       const targetColor = isHovering ? '#9cb2c6' : '#36454F'; 
