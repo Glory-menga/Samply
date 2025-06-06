@@ -13,7 +13,7 @@ const corsOptions = {
   origin: [
     'http://localhost:3000', 
     'http://localhost:5173', 
-    'https://samply-taupe.vercel.app', 
+    'https://samply-sigma.vercel.app', 
     'https://*.vercel.app' 
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
