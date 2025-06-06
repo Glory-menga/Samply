@@ -33,7 +33,7 @@ function App() {
 
   useEffect(() => {
     const detectDevice = () => {
-      const isSmallScreen = window.innerWidth <= 1024;
+      const isSmallScreen = window.innerWidth <= 490;
       setIsMobileOrTablet(isSmallScreen);
     };
 
