@@ -70,6 +70,13 @@ function Generate(){
     };
 
     useEffect(() => {
+        const savedMuteState = localStorage.getItem('audioMuted');
+        if (savedMuteState !== null) {
+            setHeadphonesOn(savedMuteState === 'false'); 
+        }
+    }, []);
+
+    useEffect(() => {
         const checkAuth = async () => {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
@@ -92,22 +99,6 @@ function Generate(){
     }, []);
 
     useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.hidden) {
-                if (audioRef.current && !audioRef.current.paused) {
-                    audioRef.current.pause();
-                }
-            }
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-
-        return () => {
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-        };
-    }, []);
-
-    useEffect(() => {
         if (!user || audioPlayed) return; 
 
         const setupAudio = async () => {
@@ -118,6 +109,7 @@ function Generate(){
                 const audio = new Audio(generateVoice);
                 audio.loop = false; 
                 audio.volume = 0.6;
+                audio.muted = !headphonesOn;
                 audioRef.current = audio;
                 
                 const analyserNode = audioContext.createAnalyser();
@@ -172,7 +164,7 @@ function Generate(){
             
             setAnalyser(null);
         };
-    }, [user, audioPlayed]);
+    }, [user, audioPlayed, headphonesOn]);
 
     useEffect(() => {
         if (audioRef.current) {
@@ -188,7 +180,10 @@ function Generate(){
 
     const toggleHeadphones = () => {
         if (!user) return;
-        setHeadphonesOn(!headphonesOn);
+        const newHeadphonesState = !headphonesOn;
+        setHeadphonesOn(newHeadphonesState);
+        
+        localStorage.setItem('audioMuted', (!newHeadphonesState).toString());
     };
 
     const handleGenerate = async () => {
