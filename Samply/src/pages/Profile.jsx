@@ -96,7 +96,9 @@ function Profile() {
 
     const checkUsernameAvailability = async (usernameToCheck) => {
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'https://samply-production.up.railway.app'}/api/community/check-username`, {
+            const backendUrl = 'https://samply-production.up.railway.app';
+            
+            const response = await fetch(`${backendUrl}/api/community/check-username`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -106,6 +108,10 @@ function Profile() {
                     exclude_user_id: user?.id 
                 })
             });
+            
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
             
             const data = await response.json();
             return data.available;

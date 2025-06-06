@@ -17,13 +17,19 @@ function Signup() {
 
     const checkUsernameAvailability = async (usernameToCheck) => {
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_URL || 'https://samply-production.up.railway.app'}/api/community/check-username`, {
+            const backendUrl = 'https://samply-production.up.railway.app';
+            
+            const response = await fetch(`${backendUrl}/api/community/check-username`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ username: usernameToCheck })
             });
+            
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
             
             const data = await response.json();
             return data.available;

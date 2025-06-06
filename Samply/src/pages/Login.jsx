@@ -39,7 +39,7 @@ function Login() {
         }
       } else {
         toast.success("You're now logged in. Start generating your samples!");
-        navigate("/");
+        navigate("/generate");
       }
     } catch (err) {
       console.error("Login error:", err);
