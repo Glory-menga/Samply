@@ -13,6 +13,10 @@ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  /**
+   * Attempts to sign in a user using Supabase email/password authentication
+   * Validates email format and handles success or error feedback via toasts
+   */
   const handleLogin = async () => {
     if (!email || !password) {
       toast.error("Email and password are required");
@@ -47,6 +51,10 @@ function Login() {
     }
   };
 
+  /**
+   * Initiates OAuth login using Google as the provider via Supabase
+   * Handles error feedback via toast notifications
+   */
   const handleGoogleLogin = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({

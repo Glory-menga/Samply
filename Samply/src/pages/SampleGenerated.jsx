@@ -325,6 +325,11 @@ function SampleGenerated(){
         };
     }, [samples, mountedRef]);
 
+    /**
+     * Handles audio playback logic:
+     * - Pauses any currently playing sample.
+     * - Plays or pauses the selected sample using WaveSurfer.
+     */
     const handlePlay = async (index) => {
         const wavesurfer = wavesurferRefs.current[index];
         if (!wavesurfer || !wavesurferReady[index]) {
@@ -344,6 +349,10 @@ function SampleGenerated(){
         }
     };
 
+    /**
+     * Downloads the selected audio sample using a proxy URL.
+     * - Fetches the audio blob and triggers a browser download with a .mp3 extension.
+     */
     const handleDownload = async (index) => {
         const sample = samples[index];
         if (!sample || !sample.audio) return;
@@ -366,10 +375,18 @@ function SampleGenerated(){
         }
     };
 
+    /**
+     * Placeholder function for saving a sample.
+     * - Displays an alert. Replace with actual saving logic as needed.
+     */
     const handleSave = (index) => {
         alert('Save functionality will be implemented based on your requirements.');
     };
 
+    /**
+     * Prepares sample data for editing by storing it in localStorage.
+     * - Navigates the user to the Edit Sample page.
+     */
     const handleEditSample = (index) => {
         const sample = samples[index];
         if (!sample) return;
@@ -387,6 +404,13 @@ function SampleGenerated(){
         navigate('/edit-sample');
     };
 
+    /**
+     * Publishes a selected sample to the community:
+     * - Verifies if the user is logged in.
+     * - Converts the audio to base64.
+     * - Sends a POST request to the backend to store the sample.
+     * - Updates the published state locally.
+     */
     const handlePublishSample = async (index) => {
         const sample = samples[index];
         if (!sample) return;
@@ -454,18 +478,31 @@ function SampleGenerated(){
         }
     };
 
+    /**
+     * Formats time in seconds to mm:ss format.
+     * @param {number} seconds - The time in seconds.
+     * @returns {string} A string formatted as mm:ss.
+     */
     const formatTime = (seconds) => {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = Math.floor(seconds % 60);
         return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
     };
 
+    /**
+     * Clears the current samples and navigates to the generation page.
+     * - Removes localStorage entries for samples and published states.
+     */
     const handleGenerateNew = () => {
         localStorage.removeItem('generatedSamples');
         localStorage.removeItem('publishedSamples');
         navigate('/generate');
     };
 
+    /**
+     * Attempts to reload a sample's waveform by destroying and resetting WaveSurfer.
+     * - Clears any previous loading error and re-initializes the waveform.
+     */
     const handleRetryLoad = (index) => {
         const wavesurfer = wavesurferRefs.current[index];
         if (wavesurfer) {

@@ -158,6 +158,11 @@ function Samples(){
         }
     }, [user, loadingSamples]);
 
+    /**
+     * Checks if the user is currently authenticated via Supabase.
+     * - Sets the `user` state if a session exists.
+     * - Listens for auth state changes to update the user.
+     */
     useEffect(() => {
         const checkAuth = async () => {
             try {
@@ -186,6 +191,11 @@ function Samples(){
         }
     }, [user]);
 
+    /**
+     * Fetches all samples posted by the logged-in user.
+     * - Initializes audio state for each sample.
+     * - Handles loading states and error notifications.
+     */
     const fetchUserSamples = async () => {
         if (!user) return;
 
@@ -218,6 +228,11 @@ function Samples(){
         }
     };
 
+    /**
+     * Converts a number of seconds into a string formatted as mm:ss.
+     * @param {number} seconds - The time in seconds.
+     * @returns {string} Time formatted as 'mm:ss'.
+     */
     const formatTime = (seconds) => {
         if (isNaN(seconds)) return '00:00';
         const minutes = Math.floor(seconds / 60);
@@ -225,6 +240,13 @@ function Samples(){
         return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
     };
 
+    /**
+     * Initializes a WaveSurfer instance for a specific sample.
+     * - Binds all necessary event listeners (play, pause, seek, error).
+     * - Updates playback state and timestamps in real-time.
+     * @param {Object} sample - The sample data object.
+     * @param {number} index - The index of the sample in the list.
+     */
     const initializeWaveSurfer = (sample, index) => {
         const waveformRef = waveformRefs.current[index];
         
@@ -352,6 +374,12 @@ function Samples(){
         };
     }, [samples]);
 
+    /**
+     * Toggles play/pause for the selected sample.
+     * - Automatically pauses any other playing sample.
+     * - Uses the WaveSurfer API to control playback.
+     * @param {number} index - The index of the sample to toggle.
+     */
     const togglePlayPause = (index) => {
         const wavesurfer = waveSurferInstances.current[index];
         const audioState = audioStates[index];
@@ -379,6 +407,11 @@ function Samples(){
         }
     };
 
+    /**
+     * Downloads a sample as an MP3 file.
+     * - Fetches the audio blob from the sample URL.
+     * - Triggers a download in the user's browser.
+     */
     const handleDownload = async (sample, index) => {
         try {
             const response = await fetch(sample.sample_url);
@@ -400,6 +433,13 @@ function Samples(){
         }
     };
 
+    /**
+     * Sends a request to mark a sample as 'saved' by the user.
+     * - Updates local UI state to reflect the save action.
+     * @param {string} sampleId - The ID of the sample to save.
+     * @param {string} sampleName - The title of the sample.
+     * @param {number} index - The index of the sample in the list.
+     */
     const handleSaveSample = async (sampleId, sampleName, index) => {
         setSavingIndex(index);
         
@@ -432,6 +472,10 @@ function Samples(){
         }
     };
 
+    /**
+     * Opens the delete confirmation modal for a sample.
+     * - Stores the selected sample's ID, name, and index in state.
+     */
     const openDeleteModal = (sampleId, sampleName, index) => {
         setDeleteModal({
             isOpen: true,
@@ -442,6 +486,9 @@ function Samples(){
         });
     };
 
+    /**
+     * Closes the delete confirmation modal and resets its state.
+     */
     const closeDeleteModal = () => {
         if (deleteModal.isDeleting) return;
         setDeleteModal({
@@ -453,6 +500,11 @@ function Samples(){
         });
     };
 
+    /**
+     * Sends a request to delete the selected sample.
+     * - Updates the local list of samples upon success.
+     * - Cleans up WaveSurfer instance and state.
+     */
     const confirmDelete = async () => {
         const { sampleId, sampleName, sampleIndex } = deleteModal;
         
@@ -502,6 +554,12 @@ function Samples(){
         }
     };
 
+    /**
+     * Formats a date string into a readable format.
+     * Example: "April 20, 2025, 2:14 PM"
+     * @param {string} dateString - The ISO date string.
+     * @returns {string} Formatted date.
+     */
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleString('en-US', {
@@ -514,10 +572,16 @@ function Samples(){
         });
     };
 
+    /**
+     * Navigates to the login page.
+     */
     const handleLogin = () => {
         navigate('/login');
     };
 
+    /**
+     * Navigates to the signup page.
+     */
     const handleSignup = () => {
         navigate('/signup');
     };

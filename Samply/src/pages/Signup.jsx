@@ -15,6 +15,11 @@ function Signup() {
     const [username, setUsername] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
+    /**
+     * Sends a POST request to the backend to check if a username is available.
+     * @param {string} usernameToCheck - The desired username entered by the user.
+     * @returns {boolean} True if the username is available, false otherwise.
+     */
     const checkUsernameAvailability = async (usernameToCheck) => {
         try {
             const backendUrl = 'https://samply-production.up.railway.app';
@@ -39,6 +44,12 @@ function Signup() {
         }
     };
 
+    /**
+     * Handles user signup process with field validation.
+     * - Checks for empty fields, valid email, and matching passwords.
+     * - Verifies username availability through backend.
+     * - Registers user with Supabase and redirects to login on success.
+     */
     const handleSignup = async () => {
         if (!email || !password || !username || !confirmPassword) {
             toast.error("All fields are required");

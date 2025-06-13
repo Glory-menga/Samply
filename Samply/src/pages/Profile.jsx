@@ -94,6 +94,11 @@ function Profile() {
         isDisconnecting: false
     });
 
+    /**
+     * Checks if a given username is available (not used by another user)
+     * @param {string} usernameToCheck The username to check for availability
+     * @returns {Promise<boolean>} True if available, false otherwise
+     */
     const checkUsernameAvailability = async (usernameToCheck) => {
         try {
             const backendUrl = 'https://samply-production.up.railway.app';
@@ -270,10 +275,17 @@ function Profile() {
         }
     }, [user]);
 
+    /**
+     * Enables editing mode for the username input field
+     */
     const handleNameEdit = () => {
         setIsEditingName(true);
     };
 
+    /**
+     * Saves the updated username after checking availability
+     * Triggers change state if the name has changed
+     */
     const handleNameSave = async () => {
         const trimmedUsername = newUserName.trim();
         
@@ -292,15 +304,27 @@ function Profile() {
         setIsEditingName(false);
     };
 
+    /**
+     * Cancels username editing and reverts to the original value
+     */
     const handleNameCancel = () => {
         setNewUserName(userName);
         setIsEditingName(false);
     };
 
+    /**
+     * Updates the new username state as user types
+     * @param {Event} e Input change event
+     */
     const handleNameChange = (e) => {
         setNewUserName(e.target.value);
     };
 
+    /**
+     * Validates and uploads a new profile image
+     * Converts the image to black and white and updates user metadata
+     * Handles cleanup of old image if it exists
+     */
     const handleImageUpload = async (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -378,6 +402,11 @@ function Profile() {
         }
     };
 
+    /**
+     * Converts a given image file to black and white using canvas
+     * @param {File} file The original image file
+     * @returns {Promise<File>} Black and white version of the image
+     */
     const convertToBlackAndWhite = (file) => {
         return new Promise((resolve, reject) => {
             const canvas = document.createElement('canvas');
@@ -428,10 +457,19 @@ function Profile() {
         });
     };
 
+    /**
+     * Triggers the hidden file input for profile picture upload
+     */
     const handleUploadClick = () => {
         document.getElementById('profile-image-input').click();
     };
 
+    /**
+     * Handles changes in the password form fields
+     * Tracks whether any password field has been modified
+     * @param {string} field Name of the password field ('newPassword' or 'confirmPassword')
+     * @param {string} value New value of the field
+     */
     const handlePasswordFormChange = (field, value) => {
         setPasswordForm(prev => ({
             ...prev,
@@ -443,6 +481,10 @@ function Profile() {
         setHasPasswordChanged(hasPasswordContent);
     };
 
+    /**
+     * Toggles the visibility of the password change form
+     * Clears the password form if toggled off
+     */
     const handleChangePasswordClick = () => {
         if (showChangePassword) {
             setPasswordForm({
@@ -454,6 +496,10 @@ function Profile() {
         setShowChangePassword(!showChangePassword);
     };
 
+    /**
+     * Saves any profile changes including username, password, or profile picture
+     * Performs validation and shows toast notifications on success or error
+     */
     const handleSave = async () => {
         if (!hasNameChanged && !hasPasswordChanged && !hasImageChanged) {
             toast.info("No changes to save");
@@ -517,10 +563,17 @@ function Profile() {
         }
     };
 
+    /**
+     * Prevents the password form from triggering a page reload on submit
+     * @param {Event} e Submit event
+     */
     const handlePasswordSubmit = (e) => {
         e.preventDefault();
     };
 
+    /**
+     * Opens the disconnect confirmation modal
+     */
     const openDisconnectModal = () => {
         setDisconnectModal({
             isOpen: true,
@@ -528,6 +581,9 @@ function Profile() {
         });
     };
 
+    /**
+     * Closes the disconnect modal if not currently processing disconnection
+     */
     const closeDisconnectModal = () => {
         if (disconnectModal.isDisconnecting) return; 
         setDisconnectModal({
@@ -536,6 +592,10 @@ function Profile() {
         });
     };
 
+    /**
+     * Signs out the current user using Supabase and navigates to login page
+     * Displays feedback and handles modal state updates
+     */
     const confirmDisconnect = async () => {
         setDisconnectModal(prev => ({ ...prev, isDisconnecting: true }));
         

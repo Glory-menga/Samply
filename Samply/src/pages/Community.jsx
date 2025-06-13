@@ -24,6 +24,12 @@ import {
   WhatsappIcon,
 } from 'react-share';
 
+/**
+ * Component for the share modal popup with social sharing options
+ * @param {boolean} isOpen - Whether the modal is visible
+ * @param {object} sample - The sample being shared
+ * @param {function} onClose - Function to close the modal
+ */
 const ShareModal = ({ isOpen, sample, onClose }) => {
     const [copied, setCopied] = useState(false);
     
@@ -168,6 +174,9 @@ const ShareModal = ({ isOpen, sample, onClose }) => {
     );
 };
 
+/**
+ * Main Community component that shows a feed of AI-generated samples
+ */
 function Community(){
     const navigate = useNavigate();
     const waveformRefs = useRef({});
@@ -260,6 +269,9 @@ function Community(){
         }
     }, [user]);
 
+    /**
+     * Fetches liked samples by the current user and updates state
+     */
     const fetchUserLikes = async () => {
         if (!user) return;
         
@@ -283,6 +295,9 @@ function Community(){
         }
     };
 
+    /**
+     * Fetches most liked/popular samples and initializes their waveform state
+     */
     const fetchPopularSamples = async () => {
         setLoadingPopular(true);
         try {
@@ -313,6 +328,9 @@ function Community(){
         }
     };
 
+    /**
+     * Fetches all samples and their creators, then sets initial playback state
+     */
     const fetchAllSamples = async () => {
         setLoadingSamples(true);
         try {
@@ -343,6 +361,12 @@ function Community(){
         }
     };
 
+    /**
+     * Toggles like status for a given sample
+     * @param {string} sampleId - The sample ID to like/unlike
+     * @param {string} section - 'popular' or 'posts'
+     * @param {number} index - Index of the sample in the list
+     */
     const handleLike = async (sampleId, section = 'posts', index) => {
         if (!user) {
             toast.error('Please log in to like samples');
@@ -419,10 +443,19 @@ function Community(){
         }
     };
 
+    /**
+     * Navigates user to comment view for a given sample
+     * @param {object} sample - The sample to comment on
+     * @param {string} section - Optional section type (default: 'posts')
+     */
     const handleCommentClick = (sample, section = 'posts') => {
         navigate('/comment-sample', { state: { sample } });
     };
 
+    /**
+     * Opens the share modal for a sample
+     * @param {object} sample - The sample to be shared
+     */
     const openShareModal = (sample) => {
         setShareModal({
             isOpen: true,
@@ -430,6 +463,9 @@ function Community(){
         });
     };
 
+    /**
+     * Closes the share modal
+     */
     const closeShareModal = () => {
         setShareModal({
             isOpen: false,
@@ -437,6 +473,11 @@ function Community(){
         });
     };
 
+    /**
+     * Converts seconds to mm:ss format
+     * @param {number} seconds - Time in seconds
+     * @returns {string} Formatted time
+     */
     const formatTime = (seconds) => {
         if (isNaN(seconds)) return '00:00';
         const minutes = Math.floor(seconds / 60);
@@ -444,6 +485,11 @@ function Community(){
         return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
     };
 
+    /**
+     * Converts a date string to relative time ago format
+     * @param {string} dateString - ISO-formatted date
+     * @returns {string} Human-readable relative time
+     */
     const formatTimeAgo = (dateString) => {
         const date = new Date(dateString);
         const now = new Date();
@@ -456,6 +502,12 @@ function Community(){
         return `${Math.floor(diffInSeconds / 604800)}w ago`;
     };
 
+    /**
+     * Initializes a WaveSurfer instance for the given sample
+     * @param {object} sample - The sample data
+     * @param {number} index - Index in the list
+     * @param {string} section - Either 'popular' or 'posts'
+     */
     const initializeWaveSurfer = async (sample, index, section = 'posts') => {
         const waveformRef = section === 'popular' 
             ? popularWaveformRefs.current[index] 
@@ -639,6 +691,11 @@ function Community(){
         };
     }, [allSamples]);
 
+    /**
+     * Toggles play/pause on the waveform player, pausing any other active audio
+     * @param {number} index - Index of the sample in its section
+     * @param {string} section - 'popular' or 'posts'
+     */
     const togglePlayPause = (index, section = 'posts') => {
         const instances = section === 'popular' 
             ? popularWaveSurferInstances.current 
@@ -673,6 +730,10 @@ function Community(){
         }
     };
 
+    /**
+     * Downloads the audio file of a sample to the user's device
+     * @param {object} sample - The sample to be downloaded
+     */
     const handleDownload = async (sample) => {
         try {
             const response = await fetch(sample.sample_url);

@@ -34,6 +34,12 @@ const supabaseAdmin = createClient(
   }
 );
 
+/**
+ * Publishes a sample:
+ * - Uploads audio to Supabase storage if needed.
+ * - Stores sample metadata in the database.
+ * - Responds with the saved sample.
+ */
 router.post('/publish-sample', async (req, res) => {
   try {
     const { 
@@ -138,6 +144,10 @@ router.post('/publish-sample', async (req, res) => {
   }
 });
 
+/**
+ * Fetches all published samples from the database.
+ * Ordered by creation date (newest first).
+ */
 router.get('/samples', async (req, res) => {
   try {
     const { data: samples, error } = await supabase
@@ -162,6 +172,10 @@ router.get('/samples', async (req, res) => {
   }
 });
 
+/**
+ * Fetches a single sample by its ID.
+ * Returns 404 if not found.
+ */
 router.get('/samples/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -189,6 +203,9 @@ router.get('/samples/:id', async (req, res) => {
   }
 });
 
+/**
+ * Fetches all samples created by a specific user.
+ */
 router.get('/user-samples/:user_id', async (req, res) => {
   try {
     const { user_id } = req.params;
@@ -216,6 +233,10 @@ router.get('/user-samples/:user_id', async (req, res) => {
   }
 });
 
+/**
+ * Deletes a sample (and its audio file) if the user is the owner.
+ * Removes from both the database and Supabase storage.
+ */
 router.delete('/samples/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -287,6 +308,9 @@ router.delete('/samples/:id', async (req, res) => {
   }
 });
 
+/**
+ * Fetches all samples marked as saved by the user.
+ */
 router.get('/user-saved-samples/:user_id', async (req, res) => {
   try {
     const { user_id } = req.params;
@@ -315,6 +339,9 @@ router.get('/user-saved-samples/:user_id', async (req, res) => {
   }
 });
 
+/**
+ * Toggles the 'saved' state of a sample for the authenticated user.
+ */
 router.put('/samples/:id/save', async (req, res) => {
   try {
     const { id } = req.params;
@@ -373,6 +400,10 @@ router.put('/samples/:id/save', async (req, res) => {
   }
 });
 
+/**
+ * Toggles like/unlike on a sample by the authenticated user.
+ * Also updates the total likes count in the sample.
+ */
 router.post('/samples/:id/like', async (req, res) => {
   try {
     const { id } = req.params;
@@ -472,6 +503,9 @@ router.post('/samples/:id/like', async (req, res) => {
   }
 });
 
+/**
+ * Retrieves all like records for a given user (sample IDs and timestamps).
+ */
 router.get('/user-likes/:user_id', async (req, res) => {
   try {
     const { user_id } = req.params;
@@ -500,6 +534,10 @@ router.get('/user-likes/:user_id', async (req, res) => {
   }
 });
 
+/**
+ * Retrieves full sample data (with user info) for all samples the user has liked.
+ * Preserves the original like order.
+ */
 router.get('/user-liked-samples/:user_id', async (req, res) => {
   try {
     const { user_id } = req.params;
@@ -580,6 +618,10 @@ router.get('/user-liked-samples/:user_id', async (req, res) => {
   }
 });
 
+/**
+ * Fetches the top 5 samples with the highest number of likes.
+ * Includes user data for each sample.
+ */
 router.get('/popular-samples', async (req, res) => {
   try {
     const { data: samples, error } = await supabase
@@ -634,6 +676,9 @@ router.get('/popular-samples', async (req, res) => {
   }
 });
 
+/**
+ * Fetches all samples and enriches each one with its creator's user data.
+ */
 router.get('/samples-with-users', async (req, res) => {
   try {
     const { data: samples, error } = await supabase
@@ -687,6 +732,9 @@ router.get('/samples-with-users', async (req, res) => {
   }
 });
 
+/**
+ * Fetches all comments for a given sample, including user data for each comment.
+ */
 router.get('/comments/:sample_id', async (req, res) => {
   try {
     const { sample_id } = req.params;
@@ -743,6 +791,10 @@ router.get('/comments/:sample_id', async (req, res) => {
   }
 });
 
+/**
+ * Posts a new comment on a sample.
+ * Also updates the comment count for that sample.
+ */
 router.post('/comments', async (req, res) => {
   try {
     const { user_id, sample_id, comment } = req.body;
@@ -801,6 +853,10 @@ router.post('/comments', async (req, res) => {
   }
 });
 
+/**
+ * Deletes a comment if it belongs to the requesting user.
+ * Updates the related sample's comment count.
+ */
 router.delete('/comments/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -868,6 +924,9 @@ router.delete('/comments/:id', async (req, res) => {
   }
 });
 
+/**
+ * Fetches samples that will expire tomorrow for a given user (only unsaved ones).
+ */
 router.get('/user-expiring-samples/:user_id', async (req, res) => {
   try {
     const { user_id } = req.params;
@@ -906,6 +965,9 @@ router.get('/user-expiring-samples/:user_id', async (req, res) => {
   }
 });
 
+/**
+ * Checks if a username is already taken (excluding a given user ID if needed).
+ */
 router.post('/check-username', async (req, res) => {
   try {
     const { username, exclude_user_id } = req.body;

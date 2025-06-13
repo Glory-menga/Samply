@@ -4,6 +4,14 @@ import replicate from '../config/replicate.js';
 
 const router = express.Router();
 
+/**
+ * Generates two AI music samples based on a user-provided prompt.
+ * 1. Cleans and corrects the prompt using LLaMA.
+ * 2. Creates two unique titles for the cleaned prompt.
+ * 3. Sends the prompt to MusicGen to generate two audio samples.
+ * 4. Returns the audio, titles, and cleaned prompt.
+ * If one sample fails, returns the other with a warning.
+ */
 router.post('/generate', async (req, res) => {
   const { prompt } = req.body;
 
@@ -146,6 +154,11 @@ router.post('/generate', async (req, res) => {
   }
 });
 
+/**
+ * Proxies an audio file stream from a remote URL.
+ * Allows clients to access audio files with proper headers and CORS handling.
+ * Used to stream audio from Replicate without triggering browser security warnings.
+ */
 router.get('/proxy-audio', async (req, res) => {
   const audioUrl = req.query.url;
   

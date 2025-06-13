@@ -130,6 +130,10 @@ function Home() {
     };
   }, []);
 
+  /**
+   * Initializes and plays the intro voiceover audio
+   * Creates an analyser node for visual feedback and handles playback completion
+   */
   const setupIntroAudio = async () => {
     try {
       if (!audioContextRef.current) return;
@@ -166,14 +170,25 @@ function Home() {
     }
   };
 
+  /**
+   * Navigates the user to the generate page when the metaball is clicked
+   */
   const handleMetaballClick = () => {
     navigate('/generate');
   };
 
+  /**
+   * Updates the isHovering state based on hover status
+   * @param {boolean} hovering Indicates if the metaball is being hovered
+   */
   const handleMetaballHover = (hovering) => {
     setIsHovering(hovering);
   };
 
+  /**
+   * Skips the intro sequence by clearing timeouts and pausing the intro audio
+   * Sets the app state directly to 'home'
+   */
   const handleSkipIntro = () => {
     if (introTimeoutRef.current) {
       clearTimeout(introTimeoutRef.current);
@@ -274,6 +289,11 @@ function Home() {
     }
   };
 
+  /**
+   * Circular SVG-based progress bar used during the loading screen
+   * @param {number} progress The current progress percentage (0-100)
+   * @returns {JSX.Element} A rendered progress circle with percentage text
+   */
   const ProgressCircle = ({ progress }) => {
     const radius = 100;
     const circumference = 2 * Math.PI * radius;

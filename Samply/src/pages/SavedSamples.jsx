@@ -125,6 +125,10 @@ function SavedSamples() {
         })
     };
 
+    /**
+     * Retrieves the current Supabase session and sets the user state.
+     * Also listens for auth state changes to keep the user updated.
+     */
     useEffect(() => {
         const checkAuth = async () => {
             try {
@@ -153,6 +157,11 @@ function SavedSamples() {
         }
     }, [user]);
 
+    /**
+     * Fetches the list of samples saved by the user from the backend.
+     * Initializes playback state for each sample.
+     * Displays error toasts if fetch fails.
+     */
     const fetchSavedSamples = async () => {
         if (!user) return;
 
@@ -185,6 +194,11 @@ function SavedSamples() {
         }
     };
 
+    /**
+     * Converts a time in seconds to a formatted mm:ss string.
+     * @param {number} seconds - Time value in seconds.
+     * @returns {string} Time formatted as 'mm:ss'.
+     */
     const formatTime = (seconds) => {
         if (isNaN(seconds)) return '00:00';
         const minutes = Math.floor(seconds / 60);
@@ -192,6 +206,12 @@ function SavedSamples() {
         return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
     };
 
+    /**
+     * Sets up a WaveSurfer instance for the given sample.
+     * Binds event listeners for playback, time updates, and error handling.
+     * @param {Object} sample - The sample data object.
+     * @param {number} index - Index of the sample in the list.
+     */
     const initializeWaveSurfer = (sample, index) => {
         const waveformRef = waveformRefs.current[index];
         
@@ -319,6 +339,11 @@ function SavedSamples() {
         };
     }, [samples]);
 
+    /**
+     * Toggles audio playback for the selected sample.
+     * Pauses other samples if one is already playing.
+     * @param {number} index - Index of the selected sample.
+     */
     const togglePlayPause = (index) => {
         const wavesurfer = waveSurferInstances.current[index];
         const audioState = audioStates[index];
@@ -346,6 +371,11 @@ function SavedSamples() {
         }
     };
 
+    /**
+     * Initiates a download for the selected sample.
+     * @param {Object} sample - Sample metadata.
+     * @param {number} index - Sample index (optional, used for targeting).
+     */
     const handleDownload = async (sample, index) => {
         try {
             const response = await fetch(sample.sample_url);
@@ -367,6 +397,10 @@ function SavedSamples() {
         }
     };
 
+    /**
+     * Opens the modal to confirm unsaving a sample.
+     * Stores the selected sample's ID, name, and index in state.
+     */
     const openUnsaveModal = (sampleId, sampleName, index) => {
         setUnsaveModal({
             isOpen: true,
@@ -377,6 +411,9 @@ function SavedSamples() {
         });
     };
 
+    /**
+     * Closes the unsave modal and resets related state values.
+     */
     const closeUnsaveModal = () => {
         if (unsaveModal.isUnsaving) return;
         setUnsaveModal({
@@ -388,6 +425,12 @@ function SavedSamples() {
         });
     };
 
+    /**
+     * Sends a request to unsave the selected sample.
+     * - Removes the sample from local state.
+     * - Destroys its WaveSurfer instance.
+     * Displays success/error notifications accordingly.
+     */
     const confirmUnsave = async () => {
         const { sampleId, sampleName, sampleIndex } = unsaveModal;
         
@@ -437,6 +480,12 @@ function SavedSamples() {
         }
     };
 
+    /**
+     * Formats a date string into a readable format like:
+     * "April 25, 2025, 2:15 PM"
+     * @param {string} dateString - ISO date string.
+     * @returns {string} Formatted display date.
+     */
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleString('en-US', {
@@ -449,10 +498,16 @@ function SavedSamples() {
         });
     };
 
+    /**
+     * Navigates to the login screen.
+     */
     const handleLogin = () => {
         navigate('/login');
     };
 
+    /**
+     * Navigates to the signup screen.
+     */
     const handleSignup = () => {
         navigate('/signup');
     };

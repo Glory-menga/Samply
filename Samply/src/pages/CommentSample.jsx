@@ -1,3 +1,10 @@
+/**
+ * CommentSample Component
+ * - Displays detailed information about a sample including audio waveform, metadata, and user comments
+ * - Allows logged-in users to play audio, post comments, and delete their own comments
+ * - Uses WaveSurfer for waveform playback and Framer Motion for smooth UI animations
+ */
+
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -26,6 +33,7 @@ function CommentSample(){
         isLoaded: false
     });
 
+    /** Framer Motion animation variants */
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: { 
@@ -63,6 +71,7 @@ function CommentSample(){
         })
     };
 
+    /** Fetch current session from Supabase */
     useEffect(() => {
         const checkAuth = async () => {
             try {
@@ -76,6 +85,7 @@ function CommentSample(){
         checkAuth();
     }, []);
 
+    /** Load sample and comments */
     useEffect(() => {
         const sampleData = location.state?.sample;
         if (sampleData) {
@@ -87,6 +97,7 @@ function CommentSample(){
         setLoading(false);
     }, [location.state]);
 
+    /** Initialize WaveSurfer when sample is available */
     useEffect(() => {
         if (sample && waveformRef.current && !waveSurferInstance.current) {
             initializeWaveSurfer();
@@ -104,6 +115,7 @@ function CommentSample(){
         };
     }, [sample]);
 
+    /** Fetch comments from the API */
     const fetchComments = async (sampleId) => {
         try {
             const response = await fetch(`https://samply-production.up.railway.app/api/community/comments/${sampleId}`);
@@ -121,6 +133,7 @@ function CommentSample(){
         }
     };
 
+    /** Initialize the WaveSurfer instance for waveform playback */
     const initializeWaveSurfer = async () => {
         if (!waveformRef.current || !sample) return;
 
@@ -205,6 +218,7 @@ function CommentSample(){
         }
     };
 
+    /** Toggle play/pause state */
     const togglePlayPause = () => {
         if (!waveSurferInstance.current || !audioState.isLoaded) return;
         
@@ -220,6 +234,7 @@ function CommentSample(){
         }
     };
 
+    /** Download audio sample */
     const handleDownload = async () => {
         if (!sample) return;
         
@@ -243,6 +258,7 @@ function CommentSample(){
         }
     };
 
+    /** Post a new comment */
     const handleCommentSubmit = async () => {
         if (!user) {
             toast.error('Please log in to comment');
@@ -282,6 +298,7 @@ function CommentSample(){
         }
     };
 
+    /** Delete a comment */
     const handleDeleteComment = async (commentId) => {
         if (!user) {
             toast.error('Please log in to delete comments');
@@ -313,6 +330,7 @@ function CommentSample(){
         }
     };
 
+    /** Format time in MM:SS */
     const formatTime = (seconds) => {
         if (isNaN(seconds)) return '00:00';
         const minutes = Math.floor(seconds / 60);
@@ -345,6 +363,7 @@ function CommentSample(){
 
     return(
         <>
+        {/* AnimatedBackground and JSX UI remain as-is */}
             <AnimatedBackground />
             <motion.div 
                 className='comment-sample-container'

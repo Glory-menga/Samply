@@ -36,6 +36,11 @@ function EditSample(){
     const tempoLevels = ['Very Fast', 'Fast', 'Normal', 'Slow', 'Very Slow'];
     const tempoMultipliers = [2, 1.5, 1, 0.75, 0.5];
 
+    /**
+     * Converts an AudioBuffer to a WAV file Blob
+     * @param {AudioBuffer} audioBuffer The audio buffer to convert
+     * @returns {Blob} WAV formatted audio blob
+     */
     const audioBufferToWav = (audioBuffer) => {
         const numberOfChannels = audioBuffer.numberOfChannels;
         const sampleRate = audioBuffer.sampleRate;
@@ -133,6 +138,10 @@ function EditSample(){
         }
     }, [tempoValue, audioLoaded]);
 
+    /**
+     * Cleans up audio nodes, animation frames, and references created by Tone.js
+     * Disposes of players and analyzers to prevent memory leaks
+     */
     const cleanup = () => {
         if (animationFrameRef.current) {
             cancelAnimationFrame(animationFrameRef.current);
@@ -157,6 +166,11 @@ function EditSample(){
         }
     };
 
+    /**
+     * Sets up the audio player with Tone.js using the selected sample
+     * Connects pitch shifting, waveform analysis, and output stream recording
+     * Handles audio load success and error states
+     */
     const initializeAudio = async () => {
         try {
             cleanup();
@@ -217,6 +231,10 @@ function EditSample(){
         }
     };
 
+    /**
+     * Toggles audio playback: plays or stops the sample
+     * Handles playback tracking, looping, and animation updates
+     */
     const handlePlayPause = async () => {
         if (!playerRef.current || !audioLoaded) return;
 
@@ -270,6 +288,11 @@ function EditSample(){
         }
     };
 
+    /**
+     * Records the audio output stream, converts it to WAV or WebM,
+     * and triggers a download of the edited sample
+     * Ensures proper cleanup after recording
+     */
     const handleDownload = async () => {
         if (!playerRef.current || !audioLoaded || !destinationRef.current) {
             alert('Audio not ready for download. Please wait for audio to load.');
@@ -374,12 +397,22 @@ function EditSample(){
         }
     };
 
+    /**
+     * Converts time from seconds to MM:SS format for UI display
+     * @param {number} seconds Time in seconds
+     * @returns {string} Formatted time string
+     */
     const formatTime = (seconds) => {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = Math.floor(seconds % 60);
         return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
     };
 
+    /**
+     * Enables or disables reverse playback for the sample
+     * Stops playback if currently playing
+     * @param {boolean} checked Indicates if reverse mode is toggled on
+     */
     const handleReverseToggle = (checked) => {
         setReverse(checked);
         
@@ -389,10 +422,19 @@ function EditSample(){
         }
     };
 
+    /**
+     * Updates the pitch shift value for the audio
+     * @param {number} value Semitone shift to apply
+     */
     const handlePitchChange = (value) => {
         setPitchShift(value);
     };
 
+    /**
+     * Updates the playback tempo based on slider input
+     * Adjusts Tone.js playback rate according to tempo multipliers
+     * @param {number} value Tempo index (0 = Very Fast, 4 = Very Slow)
+     */
     const handleTempoChange = (value) => {
         setTempoValue(value);
         if (playerRef.current && audioLoaded) {

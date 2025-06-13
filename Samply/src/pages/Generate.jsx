@@ -172,12 +172,20 @@ function Generate(){
         }
     }, [headphonesOn]);
 
+    /**
+     * Picks a random prompt from the inspirationPrompts list
+     * and updates the input field with it if the user is logged in
+     */
     const handleGetInspiration = () => {
         if (!user) return;
         const randomPrompt = inspirationPrompts[Math.floor(Math.random() * inspirationPrompts.length)];
         setPrompt(randomPrompt);
     };
 
+    /**
+     * Toggles audio mute/unmute state and stores preference in localStorage
+     * Only works if the user is logged in
+     */
     const toggleHeadphones = () => {
         if (!user) return;
         const newHeadphonesState = !headphonesOn;
@@ -186,6 +194,11 @@ function Generate(){
         localStorage.setItem('audioMuted', (!newHeadphonesState).toString());
     };
 
+    /**
+     * Sends a prompt to the backend to generate samples using AI
+     * Stores the response in localStorage and navigates to the result page
+     * Handles UI state during loading and fallback for errors
+     */
     const handleGenerate = async () => {
         if (!user || !prompt.trim() || isGenerating) return;
         
@@ -229,6 +242,11 @@ function Generate(){
         }
     };
 
+    /**
+     * Handles Enter key press in the input field to trigger generation
+     * Prevents default form submission behavior
+     * @param {KeyboardEvent} e Key press event
+     */
     const handleKeyPress = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault(); 
@@ -236,10 +254,16 @@ function Generate(){
         }
     };
 
+    /**
+     * Redirects the user to the login page
+     */
     const handleLogin = () => {
         navigate('/login');
     };
 
+    /**
+     * Redirects the user to the signup page
+     */
     const handleSignup = () => {
         navigate('/signup');
     };

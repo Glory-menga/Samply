@@ -1,3 +1,7 @@
+/**
+ * Displays a 404 error page for undefined routes
+ * Includes a message and a link to navigate back to the home page
+ */
 import { Link } from 'react-router-dom';
 import AnimatedBackground from '../components/background/AnimatedBackground';
 import '../css/NotFound.css';

@@ -135,6 +135,10 @@ function LikedSamples() {
         }
     }, [user]);
 
+    /**
+     * Fetches the list of samples liked by the authenticated user
+     * Initializes audio state for each sample and handles fetch errors
+     */
     const fetchLikedSamples = async () => {
         if (!user) return;
         
@@ -175,6 +179,11 @@ function LikedSamples() {
         }
     };
 
+    /**
+     * Converts a time value in seconds to MM:SS string format
+     * @param {number} seconds Time in seconds
+     * @returns {string} Formatted time string (e.g., "01:24")
+     */
     const formatTime = (seconds) => {
         if (isNaN(seconds)) return '00:00';
         const minutes = Math.floor(seconds / 60);
@@ -182,6 +191,11 @@ function LikedSamples() {
         return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
     };
 
+    /**
+     * Sends a HEAD request to verify that the audio file URL is accessible
+     * @param {string} url URL of the audio file
+     * @returns {boolean} Whether the URL is reachable
+     */
     const testAudioUrl = async (url) => {
         try {
             const response = await fetch(url, { method: 'HEAD' });
@@ -192,6 +206,12 @@ function LikedSamples() {
         }
     };
 
+    /**
+     * Sets up and configures a WaveSurfer instance for the given sample index
+     * Loads the waveform, sets up playback events, and updates audio state
+     * @param {object} sample The sample object containing audio data
+     * @param {number} index The index of the sample in the list
+     */
     const initializeWaveSurfer = async (sample, index) => {
         const waveformRef = waveformRefs.current[index];
         
@@ -396,6 +416,11 @@ function LikedSamples() {
         };
     }, [likedSamples]);
 
+    /**
+     * Toggles play/pause state for a specific audio sample
+     * Automatically pauses any currently playing sample before playing a new one
+     * @param {number} index Index of the sample to toggle playback
+     */
     const togglePlayPause = (index) => {
         const wavesurfer = waveSurferInstances.current[index];
         const audioState = audioStates[index];
@@ -426,6 +451,11 @@ function LikedSamples() {
         }
     };
 
+    /**
+     * Downloads the audio file for a given sample
+     * Creates a temporary link to trigger file download in the browser
+     * @param {object} sample The sample to download
+     */
     const handleDownload = async (sample) => {
         try {
             const response = await fetch(sample.sample_url);
@@ -447,6 +477,12 @@ function LikedSamples() {
         }
     };
 
+    /**
+     * Sends a request to unlike a sample and removes it from the liked list
+     * Updates local state to reflect removal
+     * @param {string} sampleId ID of the sample to unlike
+     * @param {number} index Index of the sample in the UI
+     */
     const handleUnlike = async (sampleId, index) => {
         if (!user) return;
 
@@ -475,19 +511,34 @@ function LikedSamples() {
         }
     };
 
+    /**
+     * Navigates the user back to the previous page
+     * Only works if the user is authenticated
+     */
     const handleGoBack = () => {
         if (!user) return;
         navigate(-1);
     };
 
+    /**
+     * Navigates the user to the login page
+     */
     const handleLogin = () => {
         navigate('/login');
     };
 
+    /**
+     * Navigates the user to the signup page
+     */
     const handleSignup = () => {
         navigate('/signup');
     };
 
+    /**
+     * Returns inline styles for the play/pause button based on the sample's audio state
+     * @param {number} index Index of the sample
+     * @returns {object} Style object for the button
+     */
     const getButtonStyle = (index) => {
         const audioState = audioStates[index];
         if (!audioState) return { opacity: 0.5, cursor: 'not-allowed' };
