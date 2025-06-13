@@ -4,9 +4,16 @@ import AnimatedBackground from "./background/AnimatedBackground";
 import Metaball from "./3dObjects/Metaball";
 import '../css/LoadingPage.css';
 
+/**
+ * LoadingPage component
+ * - Displays an animated background with two reactive Metaball 3D spheres
+ * - Cycles through loading messages while sample generation is in progress
+ * - Uses Framer Motion for smooth transitions between messages and elements
+ */
 function LoadingPage() {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
-  
+
+  // Rotating loading messages to show progress and maintain user engagement
   const loadingMessages = [
     "Turning words into music... just a moment while we create your custom sample.",
     "Analyzing your prompt and crafting the perfect sound signature...",
@@ -16,16 +23,20 @@ function LoadingPage() {
     "Almost ready! Preparing your sample for the perfect beat..."
   ];
 
+  /**
+   * Automatically updates the message every 10 seconds
+   */
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentMessageIndex((prevIndex) => 
         (prevIndex + 1) % loadingMessages.length
       );
-    }, 10000); 
+    }, 10000);
 
     return () => clearInterval(interval);
   }, [loadingMessages.length]);
 
+  // Animation states for Framer Motion transitions
   const textVariants = {
     initial: { 
       opacity: 0, 
@@ -52,6 +63,7 @@ function LoadingPage() {
   return (
     <>
       <AnimatedBackground />
+      
       <motion.div 
         className="loading-page-container"
         initial={{ opacity: 0 }}
@@ -61,6 +73,7 @@ function LoadingPage() {
           ease: "easeOut"
         }}
       >
+        {/* Animated 3D metaballs */}
         <motion.div 
           className="metaballs-loading"
           initial={{ opacity: 0, y: 20 }}
@@ -72,13 +85,14 @@ function LoadingPage() {
           }}
         >
           <div className="metaball-loading">
-            <Metaball width="100%" height="100%" sphereScale={1.4} animationSpeed={2}/>
+            <Metaball width="100%" height="100%" sphereScale={1.4} animationSpeed={2} />
           </div>
           <div className="metaball-loading">
-            <Metaball width="100%" height="100%" sphereScale={1.4} animationSpeed={2}/>
+            <Metaball width="100%" height="100%" sphereScale={1.4} animationSpeed={2} />
           </div>
         </motion.div>
-        
+
+        {/* Cycling loading messages with animation */}
         <div className="loading-text-container">
           <AnimatePresence mode="wait">
             <motion.p

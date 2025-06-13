@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { MoveUp } from 'lucide-react';
 
+/**
+ * ScrollToTopButton component
+ * - Displays a button when the user scrolls down the page
+ * - Clicking the button smoothly scrolls the page to the top
+ */
 const ScrollToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);
 
+  /**
+   * Toggles the visibility of the scroll-to-top button based on scroll position
+   */
   const toggleVisibility = () => {
     if (window.pageYOffset > 300) {
       setIsVisible(true);
@@ -12,6 +20,9 @@ const ScrollToTopButton = () => {
     }
   };
 
+  /**
+   * Smoothly scrolls the window to the top
+   */
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -19,6 +30,7 @@ const ScrollToTopButton = () => {
     });
   };
 
+  // Set up scroll listener on mount, clean up on unmount
   useEffect(() => {
     window.addEventListener('scroll', toggleVisibility);
     return () => {
